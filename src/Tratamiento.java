@@ -1,31 +1,17 @@
 public class Tratamiento {
-    private int id;
     private Paciente paciente;
-    private String tratamiento;
+    private String descripcion;
 
-    public Tratamiento(int id, Paciente paciente, String tratamiento) {
-        this.id = id;
+    public Tratamiento(Paciente paciente, String descripcion) {
         this.paciente = paciente;
-        this.tratamiento = tratamiento;
-    }
-
-    public int getId() {
-        return id;
+        this.descripcion = descripcion;
     }
 
     public Paciente getPaciente() {
         return paciente;
     }
 
-    public String getTratamiento() {
-        return tratamiento;
-    }
-
-    public void asignarTratamiento() {
-        // Implementar lógica para asignar un tratamiento
-    }
-
-    public void verTratamiento() {
-        // Implementar lógica para ver un tratamiento
+    public String getDescripcion() {
+        return descripcion;
     }
 }

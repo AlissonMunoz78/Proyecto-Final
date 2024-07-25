@@ -1,33 +1,19 @@
 public abstract class Usuario {
-    private int id;
-    private String nombre;
-    private String apellido;
-    private String rol;
+    protected String nombreUsuario;
+    protected String contraseña;
 
-    public Usuario(int id, String nombre, String apellido, String rol) {
-        this.id = id;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.rol = rol;
+    public Usuario(String nombreUsuario, String contraseña) {
+        this.nombreUsuario = nombreUsuario;
+        this.contraseña = contraseña;
     }
 
-    public int getId() {
-        return id;
+    public String getNombreUsuario() {
+        return nombreUsuario;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getContraseña() {
+        return contraseña;
     }
 
-    public String getApellido() {
-        return apellido;
-    }
-
-    public String getRol() {
-        return rol;
-    }
-
-    public abstract void login();
-
-    public abstract void logout();
+    public abstract void mostrarOpciones();
 }

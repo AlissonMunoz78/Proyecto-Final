@@ -2,33 +2,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistorialMedico {
-    private int id;
     private Paciente paciente;
-    private List<String> historial;
+    private ArrayList<String> historial;
+    private static final ArrayList<String> especialidades = new ArrayList<>(List.of("General", "Odontólogo", "Ginecólogo", "Traumatólogo", "Pediatría", "Psicología", "Cardiólogo"));
 
     public HistorialMedico(Paciente paciente) {
-        this.id = paciente.getId();
         this.paciente = paciente;
         this.historial = new ArrayList<>();
     }
 
-    public int getId() {
-        return id;
+    public void agregarRegistro(String especialidad, String registro) {
+        if (!especialidades.contains(especialidad)) {
+            throw new IllegalArgumentException("Especialidad no válida.");
+        }
+
+        if (especialidad.equals("Pediatría") && paciente.getEdad() >= 12) {
+            throw new IllegalArgumentException("Pediatría solo apta para niños menores de 12 años.");
+        }
+
+        historial.add("Especialidad: " + especialidad + " - " + registro);
     }
 
     public Paciente getPaciente() {
         return paciente;
     }
 
-    public List<String> getHistorial() {
+    public ArrayList<String> getHistorial() {
         return historial;
-    }
-
-    public void agregarRegistro(String registro) {
-        historial.add(registro);
-    }
-
-    public void verHistorial() {
-        // Implementar lógica para ver el historial médico
     }
 }
