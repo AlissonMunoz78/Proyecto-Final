@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost:3306/proyectofinal";
     private static final String USER = "root";
-    private static final String PASSWORD = "password";
+    private static final String PASSWORD = "123456";
 
     public static Connection getConnection() throws Exception {
         Class.forName("com.mysql.cj.jdbc.Driver");
