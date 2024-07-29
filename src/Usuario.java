@@ -1,135 +1,117 @@
+import database.DatabaseConnection;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class Usuario extends JFrame {
-    private JButton registerUserButton;
-    private JButton viewUsersButton;
-    private JTextArea displayArea;
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+    private JComboBox<String> roleComboBox;
 
-    public Usuario() {
-        setTitle("Gestión de Usuarios - MediCare");
-        setSize(600, 400);
+    public Usuario(int i, String medico, String medico123, String s) {
+        setTitle("Login / Registro - MediCare");
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(1, 2));
-
-        registerUserButton = new JButton("Registrar Usuario");
-        viewUsersButton = new JButton("Ver Usuarios");
-
-        buttonPanel.add(registerUserButton);
-        buttonPanel.add(viewUsersButton);
-
-        displayArea = new JTextArea();
-        displayArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(displayArea);
-
-        panel.add(buttonPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
-
+        JPanel panel = new JPanel(new GridLayout(4, 2));
         add(panel);
 
-        registerUserButton.addActionListener(new ActionListener() {
+        panel.add(new JLabel("Username:"));
+        usernameField = new JTextField();
+        panel.add(usernameField);
+
+        panel.add(new JLabel("Password:"));
+        passwordField = new JPasswordField();
+        panel.add(passwordField);
+
+        panel.add(new JLabel("Role:"));
+        roleComboBox = new JComboBox<>(new String[]{"administrador", "medico"});
+        panel.add(roleComboBox);
+
+        JButton loginButton = new JButton("Login");
+        loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                registrarUsuario();
+                handleLogin();
             }
         });
+        panel.add(loginButton);
 
-        viewUsersButton.addActionListener(new ActionListener() {
+        JButton registerButton = new JButton("Register");
+        registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                verUsuarios();
+                handleRegister();
             }
         });
+        panel.add(registerButton);
     }
 
-    private void registrarUsuario() {
-        JTextField usernameField = new JTextField();
-        JTextField passwordField = new JTextField();
-        JTextField roleField = new JTextField();
-
-        Object[] fields = {
-                "Nombre de Usuario:", usernameField,
-                "Contraseña:", passwordField,
-                "Rol:", roleField
-        };
-
-        int option = JOptionPane.showConfirmDialog(this, fields, "Registrar Usuario", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            String username = usernameField.getText();
-            String password = passwordField.getText();
-            String role = roleField.getText();
-
-            try {
-                Connection con = getConnection();
-                String query = "INSERT INTO Usuarios (username, password, rol) VALUES (?, ?, ?)";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setString(1, username);
-                ps.setString(2, password);
-                ps.setString(3, role);
-                ps.executeUpdate();
-
-                ps.close();
-                con.close();
-
-                displayArea.setText("Usuario registrado con éxito.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                displayArea.setText("Error al registrar el usuario.");
-            }
-        }
+    public Usuario(boolean b) {
+        setVisible(b);
     }
 
-    private void verUsuarios() {
-        try {
-            Connection con = getConnection();
-            String query = "SELECT * FROM Usuarios";
+    private void handleLogin() {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+        String role = (String) roleComboBox.getSelectedItem();
+
+        try (Connection con = DatabaseConnection.getConnection()) {
+            String query = "SELECT * FROM Usuarios WHERE username = ? AND password = ? AND rol = ?";
             PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ps.setString(3, role);
             ResultSet rs = ps.executeQuery();
 
-            StringBuilder sb = new StringBuilder();
-            while (rs.next()) {
-                sb.append("ID Usuario: ").append(rs.getInt("id")).append("\n");
-                sb.append("Nombre de Usuario: ").append(rs.getString("username")).append("\n");
-                sb.append("Rol: ").append(rs.getString("rol")).append("\n\n");
+            if (rs.next()) {
+                if (role.equals("administrador")) {
+                    new Administrador().setVisible(true);
+                } else if (role.equals("medico")) {
+                    Usuario medico = new Usuario(rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getString("rol"));
+                    new PersonalMedico(medico).setVisible(true);
+                }
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Credenciales incorrectas.");
             }
-
-            displayArea.setText(sb.toString());
-
-            rs.close();
-            ps.close();
-            con.close();
         } catch (Exception ex) {
             ex.printStackTrace();
-            displayArea.setText("Error al obtener los usuarios.");
+            JOptionPane.showMessageDialog(null, "Error al conectar con la base de datos.");
         }
     }
 
-    public Connection getConnection() throws Exception {
-        String URL = "jdbc:mysql://localhost:3306/proyectofinal";
-        String USER = "root";
-        String PASSWORD = "password";
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    private void handleRegister() {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+        String role = (String) roleComboBox.getSelectedItem();
+
+        try (Connection con = DatabaseConnection.getConnection()) {
+            String query = "INSERT INTO Usuarios (username, password, rol) VALUES (?, ?, ?)";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ps.setString(3, role);
+            ps.executeUpdate();
+
+            JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al registrar el usuario.");
+        }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Usuario().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new Usuario(2, "medico", "medico123", "medico").setVisible(true));
+    }
+
+    public int getId() {
+        return 0;
     }
 }

@@ -1,136 +1,79 @@
+import database.DatabaseConnection;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 public class Cita extends JFrame {
-    private JButton registerAppointmentButton;
-    private JButton viewAppointmentsButton;
-    private JTextArea displayArea;
+    private Usuario medico;
 
-    public Cita() {
-        // Configuración de la ventana principal
-        setTitle("Registro de Citas - MediCare");
-        setSize(600, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public Cita(Usuario medico) {
+        this.medico = medico;
+
+        setTitle("Registrar Cita - MediCare");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Crear panel principal
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        JPanel panel = new JPanel(new GridLayout(5, 2));
 
-        // Panel de botones
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(1, 2));
+        JTextField pacienteIdField = new JTextField();
+        JTextField fechaField = new JTextField();
+        JTextField horaField = new JTextField();
+        JTextField especialidadField = new JTextField();
 
-        registerAppointmentButton = new JButton("Registrar Cita");
-        viewAppointmentsButton = new JButton("Ver Citas");
+        panel.add(new JLabel("ID del Paciente:"));
+        panel.add(pacienteIdField);
 
-        buttonPanel.add(registerAppointmentButton);
-        buttonPanel.add(viewAppointmentsButton);
+        panel.add(new JLabel("Fecha (YYYY-MM-DD):"));
+        panel.add(fechaField);
 
-        // Área de visualización
-        displayArea = new JTextArea();
-        displayArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(displayArea);
+        panel.add(new JLabel("Hora (HH:MM:SS):"));
+        panel.add(horaField);
 
-        // Agregar paneles al marco
-        panel.add(buttonPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(new JLabel("Especialidad:"));
+        panel.add(especialidadField);
+
+        JButton registrarButton = new JButton("Registrar");
+        panel.add(new JLabel(""));
+        panel.add(registrarButton);
 
         add(panel);
 
-        // Acciones de los botones
-        registerAppointmentButton.addActionListener(new ActionListener() {
+        registrarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                registrarCita();
-            }
-        });
+                int pacienteId = Integer.parseInt(pacienteIdField.getText());
+                String fecha = fechaField.getText();
+                String hora = horaField.getText();
+                String especialidad = especialidadField.getText();
 
-        viewAppointmentsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                verCitas();
-            }
-        });
-    }
-
-    // Método para registrar una cita
-    private void registrarCita() {
-        JTextField pacienteIdField = new JTextField();
-        JTextField doctorIdField = new JTextField();
-        JTextField fechaCitaField = new JTextField();
-        JTextField horaCitaField = new JTextField();
-
-        Object[] message = {
-                "ID del Paciente:", pacienteIdField,
-                "ID del Doctor:", doctorIdField,
-                "Fecha de la Cita (YYYY-MM-DD):", fechaCitaField,
-                "Hora de la Cita (HH:MM):", horaCitaField
-        };
-
-        int option = JOptionPane.showConfirmDialog(this, message, "Registrar Cita", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            String pacienteId = pacienteIdField.getText().trim();
-            String doctorId = doctorIdField.getText().trim();
-            String fechaCita = fechaCitaField.getText().trim();
-            String horaCita = horaCitaField.getText().trim();
-
-            if (!pacienteId.isEmpty() && !doctorId.isEmpty() && !fechaCita.isEmpty() && !horaCita.isEmpty()) {
-                try (Connection con = getConnection();
-                     PreparedStatement ps = con.prepareStatement("INSERT INTO Citas (pacienteId, doctorId, fechaCita, horaCita) VALUES (?, ?, ?, ?)")) {
-                    ps.setInt(1, Integer.parseInt(pacienteId));
-                    ps.setInt(2, Integer.parseInt(doctorId));
-                    ps.setString(3, fechaCita);
-                    ps.setString(4, horaCita);
+                try (Connection con = DatabaseConnection.getConnection()) {
+                    String query = "INSERT INTO Citas (paciente_id, medico_id, fecha, hora, especialidad) VALUES (?, ?, ?, ?, ?)";
+                    PreparedStatement ps = con.prepareStatement(query);
+                    ps.setInt(1, pacienteId);
+                    ps.setInt(2, medico.getId());
+                    ps.setString(3, fecha);
+                    ps.setString(4, hora);
+                    ps.setString(5, especialidad);
                     ps.executeUpdate();
-                    displayArea.setText("Cita registrada exitosamente.");
+
+                    JOptionPane.showMessageDialog(null, "Cita registrada con éxito.");
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    displayArea.setText("Error al registrar cita.");
+                    JOptionPane.showMessageDialog(null, "Error al registrar la cita.");
                 }
-            } else {
-                displayArea.setText("Por favor, complete todos los campos.");
             }
-        }
-    }
-
-    // Método para ver citas
-    private void verCitas() {
-        StringBuilder sb = new StringBuilder();
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT * FROM Citas");
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                sb.append("ID: ").append(rs.getInt("id")).append("\n");
-                sb.append("Paciente ID: ").append(rs.getInt("pacienteId")).append("\n");
-                sb.append("Doctor ID: ").append(rs.getInt("doctorId")).append("\n");
-                sb.append("Fecha: ").append(rs.getString("fechaCita")).append("\n");
-                sb.append("Hora: ").append(rs.getString("horaCita")).append("\n\n");
-            }
-            displayArea.setText(sb.toString());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            displayArea.setText("Error al obtener citas.");
-        }
-    }
-
-    // Método para obtener la conexión a la base de datos
-    public Connection getConnection() throws Exception {
-        String URL = "jdbc:mysql://localhost:3306/proyectofinal";
-        String USER = "root";
-        String PASSWORD = "password";
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        });
     }
 
     public static void main(String[] args) {
-        // Ejecutar la GUI en el hilo de despacho de eventos
-        SwingUtilities.invokeLater(() -> new Cita().setVisible(true));
+        SwingUtilities.invokeLater(() -> {
+            Usuario medico = new Usuario(2, "medico", "medico123", "medico");
+            new Cita(medico).setVisible(true);
+        });
     }
 }
