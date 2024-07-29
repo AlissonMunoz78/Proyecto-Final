@@ -31,7 +31,7 @@ public class Usuario extends JFrame {
         panel.add(passwordField);
 
         panel.add(new JLabel("Role:"));
-        roleComboBox = new JComboBox<>(new String[]{"administrador", "medico"});
+        roleComboBox = new JComboBox<>(new String[]{"Administrador", "Médico"});
         panel.add(roleComboBox);
 
         JButton loginButton = new JButton("Login");
@@ -71,9 +71,9 @@ public class Usuario extends JFrame {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                if (role.equals("administrador")) {
+                if (role.equals("Administrador")) {
                     new Administrador().setVisible(true);
-                } else if (role.equals("medico")) {
+                } else if (role.equals("Médico")) {
                     Usuario medico = new Usuario(rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getString("rol"));
                     new PersonalMedico(medico).setVisible(true);
                 }

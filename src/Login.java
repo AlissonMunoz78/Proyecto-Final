@@ -21,25 +21,51 @@ public class Login extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(5, 2));
+        JPanel panel = new JPanel(new GridBagLayout());
         add(panel);
 
-        // Campo para el nombre de usuario
-        panel.add(new JLabel("Username:"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(new JLabel("Login / Registro"), gbc);
+
+
+        gbc.gridwidth = 1;
+        gbc.gridy++;
+        panel.add(new JLabel("Username:"), gbc);
+
+        gbc.gridx++;
         usernameField = new JTextField();
-        panel.add(usernameField);
+        panel.add(usernameField, gbc);
 
-        // Campo para la contraseña
-        panel.add(new JLabel("Password:"));
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Password:"), gbc);
+
+        gbc.gridx++;
         passwordField = new JPasswordField();
-        panel.add(passwordField);
+        panel.add(passwordField, gbc);
 
-        // ComboBox para el rol (admin, medico, etc.)
-        panel.add(new JLabel("Role:"));
-        roleComboBox = new JComboBox<>(new String[]{"administrador", "medico"});
-        panel.add(roleComboBox);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Role:"), gbc);
 
-        // Botón de login
+        gbc.gridx++;
+        roleComboBox = new JComboBox<>(new String[]{"Administrador", "Médico"});
+        panel.add(roleComboBox, gbc);
+
+        // Botones
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
         loginButton = new JButton("Login");
         loginButton.addActionListener(new ActionListener() {
             @Override
@@ -47,9 +73,9 @@ public class Login extends JFrame {
                 handleLogin();
             }
         });
-        panel.add(loginButton);
+        panel.add(loginButton, gbc);
 
-        // Botón de registro
+        gbc.gridy++;
         registerButton = new JButton("Register");
         registerButton.addActionListener(new ActionListener() {
             @Override
@@ -57,7 +83,7 @@ public class Login extends JFrame {
                 handleRegister();
             }
         });
-        panel.add(registerButton);
+        panel.add(registerButton, gbc);
     }
 
     private void handleLogin() {
@@ -75,14 +101,13 @@ public class Login extends JFrame {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                // Usuario encontrado
-                if (role.equals("administrador")) {
+                if (role.equals("Administrador")) {
                     new Administrador().setVisible(true);
-                } else if (role.equals("medico")) {
+                } else if (role.equals("Médico")) {
                     Usuario medico = new Usuario(rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getString("rol"));
                     new PersonalMedico(medico).setVisible(true);
                 }
-                dispose(); // Cerrar la ventana de login
+                dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "Credenciales incorrectas.");
             }

@@ -5,7 +5,6 @@ public class Paciente {
     private String direccion;
     private String telefono;
 
-    // Constructor
     public Paciente(int id, String nombre, String apellido, String direccion, String telefono) {
         this.id = id;
         this.nombre = nombre;
@@ -14,7 +13,6 @@ public class Paciente {
         this.telefono = telefono;
     }
 
-    // Getters y Setters
     public int getId() {
         return id;
     }
