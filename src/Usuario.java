@@ -8,92 +8,114 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class Usuario extends JFrame {
-    private JTextField usernameField;
-    private JPasswordField passwordField;
-    private JButton loginButton;
-    private JLabel statusLabel;
+    private JButton registerUserButton;
+    private JButton viewUsersButton;
+    private JTextArea displayArea;
 
     public Usuario() {
-        // Configuración de la ventana principal
-        setTitle("Login - MediCare");
-        setSize(400, 300);
+        setTitle("Gestión de Usuarios - MediCare");
+        setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Crear panel principal
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 2));
+        panel.setLayout(new BorderLayout());
 
-        // Etiquetas y campos de texto
-        panel.add(new JLabel("Username:"));
-        usernameField = new JTextField();
-        panel.add(usernameField);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(1, 2));
 
-        panel.add(new JLabel("Password:"));
-        passwordField = new JPasswordField();
-        panel.add(passwordField);
+        registerUserButton = new JButton("Registrar Usuario");
+        viewUsersButton = new JButton("Ver Usuarios");
 
-        // Botón de login
-        loginButton = new JButton("Login");
-        panel.add(loginButton);
+        buttonPanel.add(registerUserButton);
+        buttonPanel.add(viewUsersButton);
 
-        // Etiqueta de estado
-        statusLabel = new JLabel("", SwingConstants.CENTER);
-        panel.add(statusLabel);
+        displayArea = new JTextArea();
+        displayArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(displayArea);
 
-        // Agregar panel al marco
+        panel.add(buttonPanel, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
         add(panel);
 
-        // Acción del botón de login
-        loginButton.addActionListener(new ActionListener() {
+        registerUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    String username = usernameField.getText();
-                    String password = new String(passwordField.getPassword());
+                registrarUsuario();
+            }
+        });
 
-                    if (login(username, password)) {
-                        statusLabel.setText("Login successful!");
-                        // Redirigir al usuario a la interfaz correspondiente
-                        // Aquí puedes agregar lógica para abrir la ventana de Administrador o Personal Médico
-                    } else {
-                        statusLabel.setText("Login failed. Please try again.");
-                    }
-                } catch (Exception ex) {
-                    statusLabel.setText("An error occurred. Please try again.");
-                    ex.printStackTrace();
-                }
+        viewUsersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                verUsuarios();
             }
         });
     }
 
-    // Método para iniciar sesión
-    public boolean login(String username, String password) throws Exception {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        boolean isAuthenticated = false;
+    private void registrarUsuario() {
+        JTextField usernameField = new JTextField();
+        JTextField passwordField = new JTextField();
+        JTextField roleField = new JTextField();
 
-        try {
-            con = getConnection();
-            String query = "SELECT * FROM Usuario WHERE username = ? AND password = ?";
-            ps = con.prepareStatement(query);
-            ps.setString(1, username);
-            ps.setString(2, password);
-            rs = ps.executeQuery();
+        Object[] fields = {
+                "Nombre de Usuario:", usernameField,
+                "Contraseña:", passwordField,
+                "Rol:", roleField
+        };
 
-            if (rs.next()) {
-                isAuthenticated = true;
+        int option = JOptionPane.showConfirmDialog(this, fields, "Registrar Usuario", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            String role = roleField.getText();
+
+            try {
+                Connection con = getConnection();
+                String query = "INSERT INTO Usuarios (username, password, rol) VALUES (?, ?, ?)";
+                PreparedStatement ps = con.prepareStatement(query);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.setString(3, role);
+                ps.executeUpdate();
+
+                ps.close();
+                con.close();
+
+                displayArea.setText("Usuario registrado con éxito.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                displayArea.setText("Error al registrar el usuario.");
             }
-        } finally {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
-            if (con != null) con.close();
         }
-        return isAuthenticated;
     }
 
-    // Método para obtener la conexión a la base de datos
+    private void verUsuarios() {
+        try {
+            Connection con = getConnection();
+            String query = "SELECT * FROM Usuarios";
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+
+            StringBuilder sb = new StringBuilder();
+            while (rs.next()) {
+                sb.append("ID Usuario: ").append(rs.getInt("id")).append("\n");
+                sb.append("Nombre de Usuario: ").append(rs.getString("username")).append("\n");
+                sb.append("Rol: ").append(rs.getString("rol")).append("\n\n");
+            }
+
+            displayArea.setText(sb.toString());
+
+            rs.close();
+            ps.close();
+            con.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            displayArea.setText("Error al obtener los usuarios.");
+        }
+    }
+
     public Connection getConnection() throws Exception {
         String URL = "jdbc:mysql://localhost:3306/proyectofinal";
         String USER = "root";
@@ -103,7 +125,6 @@ public class Usuario extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Ejecutar la GUI en el hilo de despacho de eventos
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

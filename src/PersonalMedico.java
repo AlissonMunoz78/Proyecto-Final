@@ -6,53 +6,55 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PersonalMedico extends JFrame {
+    private JButton viewScheduleButton;
     private JButton registerAppointmentButton;
-    private JButton registerMedicalHistoryButton;
-    private JButton registerExamResultButton;
-    private JButton assignTreatmentButton;
+    private JButton viewMedicalHistoryButton;
+    private JButton viewExamResultsButton;
+    private JButton viewTreatmentsButton;
     private JTextArea displayArea;
 
     public PersonalMedico() {
-        // Configuración de la ventana principal
         setTitle("Personal Médico - MediCare");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Crear panel principal
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        // Panel de botones
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(1, 4));
+        buttonPanel.setLayout(new GridLayout(1, 5));
 
+        viewScheduleButton = new JButton("Ver Horario");
         registerAppointmentButton = new JButton("Registrar Cita");
-        registerMedicalHistoryButton = new JButton("Registrar Historial Médico");
-        registerExamResultButton = new JButton("Registrar Resultado Examen");
-        assignTreatmentButton = new JButton("Asignar Tratamiento");
+        viewMedicalHistoryButton = new JButton("Ver Historial Médico");
+        viewExamResultsButton = new JButton("Ver Resultados Examen");
+        viewTreatmentsButton = new JButton("Ver Tratamientos");
 
+        buttonPanel.add(viewScheduleButton);
         buttonPanel.add(registerAppointmentButton);
-        buttonPanel.add(registerMedicalHistoryButton);
-        buttonPanel.add(registerExamResultButton);
-        buttonPanel.add(assignTreatmentButton);
+        buttonPanel.add(viewMedicalHistoryButton);
+        buttonPanel.add(viewExamResultsButton);
+        buttonPanel.add(viewTreatmentsButton);
 
-        // Área de visualización
         displayArea = new JTextArea();
         displayArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(displayArea);
 
-        // Agregar paneles al marco
         panel.add(buttonPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         add(panel);
 
-        // Acciones de los botones
+        viewScheduleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                verHorario();
+            }
+        });
+
         registerAppointmentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -60,224 +62,159 @@ public class PersonalMedico extends JFrame {
             }
         });
 
-        registerMedicalHistoryButton.addActionListener(new ActionListener() {
+        viewMedicalHistoryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                registrarHistorialMedico();
+                verHistorialMedico();
             }
         });
 
-        registerExamResultButton.addActionListener(new ActionListener() {
+        viewExamResultsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                registrarResultadoExamen();
+                verResultadosExamen();
             }
         });
 
-        assignTreatmentButton.addActionListener(new ActionListener() {
+        viewTreatmentsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                asignarTratamiento();
+                verTratamientos();
             }
         });
     }
 
-    // Método para registrar una cita
+    private void verHorario() {
+        try {
+            Connection con = getConnection();
+            String query = "SELECT * FROM Horarios WHERE medicoId = ?";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, getMedicoId());
+            ResultSet rs = ps.executeQuery();
+
+            StringBuilder sb = new StringBuilder();
+            while (rs.next()) {
+                sb.append("Día: ").append(rs.getString("dia")).append("\n");
+                sb.append("Hora Inicio: ").append(rs.getString("horaInicio")).append("\n");
+                sb.append("Hora Fin: ").append(rs.getString("horaFin")).append("\n\n");
+            }
+
+            displayArea.setText(sb.toString());
+
+            rs.close();
+            ps.close();
+            con.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            displayArea.setText("Error al obtener el horario del médico.");
+        }
+    }
+
     private void registrarCita() {
-        JTextField pacienteIdField = new JTextField();
-        JTextField fechaField = new JTextField();
-        JTextField especialidadField = new JTextField();
-        JTextField medicoIdField = new JTextField();
+        // Implementar la lógica para registrar una cita
+        displayArea.setText("Registrar Cita - Funcionalidad no implementada.");
+    }
 
-        Object[] message = {
-                "ID Paciente:", pacienteIdField,
-                "Fecha (YYYY-MM-DD):", fechaField,
-                "Especialidad:", especialidadField,
-                "ID Médico:", medicoIdField
-        };
+    private void verHistorialMedico() {
+        try {
+            Connection con = getConnection();
+            String query = "SELECT * FROM HistorialesMedicos WHERE medicoId = ?";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, getMedicoId());
+            ResultSet rs = ps.executeQuery();
 
-        int option = JOptionPane.showConfirmDialog(this, message, "Registrar Cita", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                int pacienteId = Integer.parseInt(pacienteIdField.getText());
-                String fecha = fechaField.getText();
-                String especialidad = especialidadField.getText();
-                int medicoId = Integer.parseInt(medicoIdField.getText());
-
-                Connection con = getConnection();
-                String query = "INSERT INTO Citas (pacienteId, fecha, especialidad, medicoId) VALUES (?, ?, ?, ?)";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setInt(1, pacienteId);
-                ps.setString(2, fecha);
-                ps.setString(3, especialidad);
-                ps.setInt(4, medicoId);
-                ps.executeUpdate();
-
-                ps.close();
-                con.close();
-
-                displayArea.setText("Cita registrada exitosamente.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                displayArea.setText("Error al registrar cita.");
+            StringBuilder sb = new StringBuilder();
+            while (rs.next()) {
+                sb.append("ID Historial: ").append(rs.getInt("id")).append("\n");
+                sb.append("ID Paciente: ").append(rs.getInt("pacienteId")).append("\n");
+                sb.append("Descripción: ").append(rs.getString("descripcion")).append("\n");
+                sb.append("Fecha: ").append(rs.getString("fecha")).append("\n\n");
             }
+
+            displayArea.setText(sb.toString());
+
+            rs.close();
+            ps.close();
+            con.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            displayArea.setText("Error al obtener el historial médico.");
         }
     }
 
-    // Método para registrar historial médico
-    private void registrarHistorialMedico() {
-        JTextField pacienteIdField = new JTextField();
-        JTextField medicoIdField = new JTextField();
-        JTextField descripcionField = new JTextField();
-        JTextField fechaField = new JTextField();
+    private void verResultadosExamen() {
+        try {
+            Connection con = getConnection();
+            String query = "SELECT * FROM ResultadosExamenes WHERE medicoId = ?";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, getMedicoId());
+            ResultSet rs = ps.executeQuery();
 
-        Object[] message = {
-                "ID Paciente:", pacienteIdField,
-                "ID Médico:", medicoIdField,
-                "Descripción:", descripcionField,
-                "Fecha (YYYY-MM-DD):", fechaField
-        };
-
-        int option = JOptionPane.showConfirmDialog(this, message, "Registrar Historial Médico", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                int pacienteId = Integer.parseInt(pacienteIdField.getText());
-                int medicoId = Integer.parseInt(medicoIdField.getText());
-                String descripcion = descripcionField.getText();
-                String fecha = fechaField.getText();
-
-                Connection con = getConnection();
-                String query = "INSERT INTO HistorialesMedicos (pacienteId, medicoId, descripcion, fecha) VALUES (?, ?, ?, ?)";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setInt(1, pacienteId);
-                ps.setInt(2, medicoId);
-                ps.setString(3, descripcion);
-                ps.setString(4, fecha);
-                ps.executeUpdate();
-
-                ps.close();
-                con.close();
-
-                displayArea.setText("Historial médico registrado exitosamente.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                displayArea.setText("Error al registrar historial médico.");
+            StringBuilder sb = new StringBuilder();
+            while (rs.next()) {
+                sb.append("ID Resultado: ").append(rs.getInt("id")).append("\n");
+                sb.append("ID Paciente: ").append(rs.getInt("pacienteId")).append("\n");
+                sb.append("Descripción: ").append(rs.getString("descripcion")).append("\n");
+                sb.append("Documento: ").append(rs.getString("documento")).append("\n");
+                sb.append("Fecha: ").append(rs.getString("fecha")).append("\n\n");
             }
+
+            displayArea.setText(sb.toString());
+
+            rs.close();
+            ps.close();
+            con.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            displayArea.setText("Error al obtener los resultados de exámenes.");
         }
     }
 
-    // Método para registrar resultado de examen
-    private void registrarResultadoExamen() {
-        JTextField pacienteIdField = new JTextField();
-        JTextField medicoIdField = new JTextField();
-        JTextField descripcionField = new JTextField();
-        JTextField documentoField = new JTextField();
-        JTextField fechaField = new JTextField();
+    private void verTratamientos() {
+        try {
+            Connection con = getConnection();
+            String query = "SELECT * FROM Tratamientos WHERE medicoId = ?";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, getMedicoId());
+            ResultSet rs = ps.executeQuery();
 
-        Object[] message = {
-                "ID Paciente:", pacienteIdField,
-                "ID Médico:", medicoIdField,
-                "Descripción:", descripcionField,
-                "Documento (ruta):", documentoField,
-                "Fecha (YYYY-MM-DD):", fechaField
-        };
-
-        int option = JOptionPane.showConfirmDialog(this, message, "Registrar Resultado Examen", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                int pacienteId = Integer.parseInt(pacienteIdField.getText());
-                int medicoId = Integer.parseInt(medicoIdField.getText());
-                String descripcion = descripcionField.getText();
-                String documento = documentoField.getText();
-                String fecha = fechaField.getText();
-
-                Connection con = getConnection();
-                String query = "INSERT INTO ResultadosExamenes (pacienteId, medicoId, descripcion, documento, fecha) VALUES (?, ?, ?, ?, ?)";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setInt(1, pacienteId);
-                ps.setInt(2, medicoId);
-                ps.setString(3, descripcion);
-                ps.setString(4, documento);
-                ps.setString(5, fecha);
-                ps.executeUpdate();
-
-                ps.close();
-                con.close();
-
-                displayArea.setText("Resultado de examen registrado exitosamente.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                displayArea.setText("Error al registrar resultado de examen.");
+            StringBuilder sb = new StringBuilder();
+            while (rs.next()) {
+                sb.append("ID Tratamiento: ").append(rs.getInt("id")).append("\n");
+                sb.append("ID Paciente: ").append(rs.getInt("pacienteId")).append("\n");
+                sb.append("Descripción: ").append(rs.getString("descripcion")).append("\n");
+                sb.append("Medicamento: ").append(rs.getString("medicamento")).append("\n");
+                sb.append("Fecha Inicio: ").append(rs.getString("fechaInicio")).append("\n");
+                sb.append("Fecha Fin: ").append(rs.getString("fechaFin")).append("\n\n");
             }
+
+            displayArea.setText(sb.toString());
+
+            rs.close();
+            ps.close();
+            con.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            displayArea.setText("Error al obtener los tratamientos.");
         }
     }
 
-    // Método para asignar tratamiento
-    private void asignarTratamiento() {
-        JTextField pacienteIdField = new JTextField();
-        JTextField medicoIdField = new JTextField();
-        JTextField descripcionField = new JTextField();
-        JTextField medicamentoField = new JTextField();
-        JTextField fechaInicioField = new JTextField();
-        JTextField fechaFinField = new JTextField();
-
-        Object[] message = {
-                "ID Paciente:", pacienteIdField,
-                "ID Médico:", medicoIdField,
-                "Descripción:", descripcionField,
-                "Medicamento:", medicamentoField,
-                "Fecha Inicio (YYYY-MM-DD):", fechaInicioField,
-                "Fecha Fin (YYYY-MM-DD):", fechaFinField
-        };
-
-        int option = JOptionPane.showConfirmDialog(this, message, "Asignar Tratamiento", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                int pacienteId = Integer.parseInt(pacienteIdField.getText());
-                int medicoId = Integer.parseInt(medicoIdField.getText());
-                String descripcion = descripcionField.getText();
-                String medicamento = medicamentoField.getText();
-                String fechaInicio = fechaInicioField.getText();
-                String fechaFin = fechaFinField.getText();
-
-                Connection con = getConnection();
-                String query = "INSERT INTO Tratamientos (pacienteId, medicoId, descripcion, medicamento, fechaInicio, fechaFin) VALUES (?, ?, ?, ?, ?, ?)";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setInt(1, pacienteId);
-                ps.setInt(2, medicoId);
-                ps.setString(3, descripcion);
-                ps.setString(4, medicamento);
-                ps.setString(5, fechaInicio);
-                ps.setString(6, fechaFin);
-                ps.executeUpdate();
-
-                ps.close();
-                con.close();
-
-                displayArea.setText("Tratamiento asignado exitosamente.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                displayArea.setText("Error al asignar tratamiento.");
-            }
-        }
+    private Connection getConnection() throws Exception {
+        String url = "jdbc:mysql://localhost:3306/medicare";
+        String user = "root";
+        String password = "root";
+        return DriverManager.getConnection(url, user, password);
     }
 
-    // Método para obtener la conexión a la base de datos
-    public Connection getConnection() throws Exception {
-        String URL = "jdbc:mysql://localhost:3306/proyectofinal";
-        String USER = "root";
-        String PASSWORD = "password";
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    private int getMedicoId() {
+        // Debería devolver el ID del médico autenticado
+        // Esto es un ejemplo, cambiar según la implementación
+        return 1;
     }
 
     public static void main(String[] args) {
-        // Ejecutar la GUI en el hilo de despacho de eventos
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new PersonalMedico().setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            new PersonalMedico().setVisible(true);
         });
     }
 }

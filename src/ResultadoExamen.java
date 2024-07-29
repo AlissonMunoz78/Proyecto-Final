@@ -13,17 +13,14 @@ public class ResultadoExamen extends JFrame {
     private JTextArea displayArea;
 
     public ResultadoExamen() {
-        // Configuración de la ventana principal
         setTitle("Gestión de Resultados de Exámenes - MediCare");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Crear panel principal
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        // Panel de botones
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(1, 2));
 
@@ -33,18 +30,15 @@ public class ResultadoExamen extends JFrame {
         buttonPanel.add(registerExamResultButton);
         buttonPanel.add(viewExamResultsButton);
 
-        // Área de visualización
         displayArea = new JTextArea();
         displayArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(displayArea);
 
-        // Agregar paneles al marco
         panel.add(buttonPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         add(panel);
 
-        // Acciones de los botones
         registerExamResultButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -60,7 +54,6 @@ public class ResultadoExamen extends JFrame {
         });
     }
 
-    // Método para registrar un nuevo resultado de examen
     private void registrarResultadoExamen() {
         JTextField patientIdField = new JTextField();
         JTextField examNameField = new JTextField();
@@ -102,7 +95,6 @@ public class ResultadoExamen extends JFrame {
         }
     }
 
-    // Método para ver los resultados de exámenes
     private void verResultadosExamen() {
         try {
             Connection con = getConnection();
@@ -131,7 +123,6 @@ public class ResultadoExamen extends JFrame {
         }
     }
 
-    // Método para obtener la conexión a la base de datos
     public Connection getConnection() throws Exception {
         String URL = "jdbc:mysql://localhost:3306/proyectofinal";
         String USER = "root";
@@ -141,7 +132,6 @@ public class ResultadoExamen extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Ejecutar la GUI en el hilo de despacho de eventos
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

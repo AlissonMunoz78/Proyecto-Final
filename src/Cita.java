@@ -14,7 +14,7 @@ public class Cita extends JFrame {
 
     public Cita() {
         // Configuración de la ventana principal
-        setTitle("Gestión de Citas - MediCare");
+        setTitle("Registro de Citas - MediCare");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -60,73 +60,63 @@ public class Cita extends JFrame {
         });
     }
 
-    // Método para registrar una nueva cita
+    // Método para registrar una cita
     private void registrarCita() {
-        JTextField patientIdField = new JTextField();
-        JTextField dateField = new JTextField();
-        JTextField specialtyField = new JTextField();
+        JTextField pacienteIdField = new JTextField();
         JTextField doctorIdField = new JTextField();
+        JTextField fechaCitaField = new JTextField();
+        JTextField horaCitaField = new JTextField();
 
-        Object[] fields = {
-                "ID del Paciente:", patientIdField,
-                "Fecha (YYYY-MM-DD):", dateField,
-                "Especialidad:", specialtyField,
-                "ID del Médico:", doctorIdField
+        Object[] message = {
+                "ID del Paciente:", pacienteIdField,
+                "ID del Doctor:", doctorIdField,
+                "Fecha de la Cita (YYYY-MM-DD):", fechaCitaField,
+                "Hora de la Cita (HH:MM):", horaCitaField
         };
 
-        int option = JOptionPane.showConfirmDialog(this, fields, "Registrar Cita", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, message, "Registrar Cita", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            int patientId = Integer.parseInt(patientIdField.getText());
-            String date = dateField.getText();
-            String specialty = specialtyField.getText();
-            int doctorId = Integer.parseInt(doctorIdField.getText());
+            String pacienteId = pacienteIdField.getText().trim();
+            String doctorId = doctorIdField.getText().trim();
+            String fechaCita = fechaCitaField.getText().trim();
+            String horaCita = horaCitaField.getText().trim();
 
-            try {
-                Connection con = getConnection();
-                String query = "INSERT INTO Citas (pacienteId, fecha, especialidad, medicoId) VALUES (?, ?, ?, ?)";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setInt(1, patientId);
-                ps.setString(2, date);
-                ps.setString(3, specialty);
-                ps.setInt(4, doctorId);
-                ps.executeUpdate();
-
-                ps.close();
-                con.close();
-
-                displayArea.setText("Cita registrada con éxito.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                displayArea.setText("Error al registrar la cita.");
+            if (!pacienteId.isEmpty() && !doctorId.isEmpty() && !fechaCita.isEmpty() && !horaCita.isEmpty()) {
+                try (Connection con = getConnection();
+                     PreparedStatement ps = con.prepareStatement("INSERT INTO Citas (pacienteId, doctorId, fechaCita, horaCita) VALUES (?, ?, ?, ?)")) {
+                    ps.setInt(1, Integer.parseInt(pacienteId));
+                    ps.setInt(2, Integer.parseInt(doctorId));
+                    ps.setString(3, fechaCita);
+                    ps.setString(4, horaCita);
+                    ps.executeUpdate();
+                    displayArea.setText("Cita registrada exitosamente.");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    displayArea.setText("Error al registrar cita.");
+                }
+            } else {
+                displayArea.setText("Por favor, complete todos los campos.");
             }
         }
     }
 
-    // Método para ver las citas
+    // Método para ver citas
     private void verCitas() {
-        try {
-            Connection con = getConnection();
-            String query = "SELECT * FROM Citas";
-            PreparedStatement ps = con.prepareStatement(query);
-            ResultSet rs = ps.executeQuery();
-
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM Citas");
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                sb.append("ID Cita: ").append(rs.getInt("id")).append("\n");
-                sb.append("ID Paciente: ").append(rs.getInt("pacienteId")).append("\n");
-                sb.append("Fecha: ").append(rs.getString("fecha")).append("\n");
-                sb.append("Especialidad: ").append(rs.getString("especialidad")).append("\n");
-                sb.append("ID Médico: ").append(rs.getInt("medicoId")).append("\n\n");
+                sb.append("ID: ").append(rs.getInt("id")).append("\n");
+                sb.append("Paciente ID: ").append(rs.getInt("pacienteId")).append("\n");
+                sb.append("Doctor ID: ").append(rs.getInt("doctorId")).append("\n");
+                sb.append("Fecha: ").append(rs.getString("fechaCita")).append("\n");
+                sb.append("Hora: ").append(rs.getString("horaCita")).append("\n\n");
             }
-
             displayArea.setText(sb.toString());
-
-            rs.close();
-            ps.close();
-            con.close();
         } catch (Exception ex) {
             ex.printStackTrace();
-            displayArea.setText("Error al obtener las citas.");
+            displayArea.setText("Error al obtener citas.");
         }
     }
 
@@ -141,11 +131,6 @@ public class Cita extends JFrame {
 
     public static void main(String[] args) {
         // Ejecutar la GUI en el hilo de despacho de eventos
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Cita().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new Cita().setVisible(true));
     }
 }

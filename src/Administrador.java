@@ -6,8 +6,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Administrador extends JFrame {
     private JButton addPatientButton;
@@ -100,43 +98,38 @@ public class Administrador extends JFrame {
 
         int option = JOptionPane.showConfirmDialog(this, message, "Agregar Paciente", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            try {
-                String nombre = nombreField.getText();
-                String apellido = apellidoField.getText();
-                String direccion = direccionField.getText();
-                String telefono = telefonoField.getText();
-                String fechaNacimiento = fechaNacimientoField.getText();
+            String nombre = nombreField.getText().trim();
+            String apellido = apellidoField.getText().trim();
+            String direccion = direccionField.getText().trim();
+            String telefono = telefonoField.getText().trim();
+            String fechaNacimiento = fechaNacimientoField.getText().trim();
 
-                Connection con = getConnection();
-                String query = "INSERT INTO Pacientes (nombre, apellido, direccion, telefono, fechaNacimiento) VALUES (?, ?, ?, ?, ?)";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setString(1, nombre);
-                ps.setString(2, apellido);
-                ps.setString(3, direccion);
-                ps.setString(4, telefono);
-                ps.setString(5, fechaNacimiento);
-                ps.executeUpdate();
-
-                ps.close();
-                con.close();
-
-                displayArea.setText("Paciente agregado exitosamente.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                displayArea.setText("Error al agregar paciente.");
+            if (!nombre.isEmpty() && !apellido.isEmpty() && !direccion.isEmpty() && !telefono.isEmpty() && !fechaNacimiento.isEmpty()) {
+                try (Connection con = getConnection();
+                     PreparedStatement ps = con.prepareStatement("INSERT INTO Pacientes (nombre, apellido, direccion, telefono, fechaNacimiento) VALUES (?, ?, ?, ?, ?)")) {
+                    ps.setString(1, nombre);
+                    ps.setString(2, apellido);
+                    ps.setString(3, direccion);
+                    ps.setString(4, telefono);
+                    ps.setString(5, fechaNacimiento);
+                    ps.executeUpdate();
+                    displayArea.setText("Paciente agregado exitosamente.");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    displayArea.setText("Error al agregar paciente.");
+                }
+            } else {
+                displayArea.setText("Por favor, complete todos los campos.");
             }
         }
     }
 
     // Método para ver los pacientes
     private void verPacientes() {
-        try {
-            Connection con = getConnection();
-            String query = "SELECT * FROM Pacientes";
-            PreparedStatement ps = con.prepareStatement(query);
-            ResultSet rs = ps.executeQuery();
-
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM Pacientes");
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 sb.append("ID: ").append(rs.getInt("id")).append("\n");
                 sb.append("Nombre: ").append(rs.getString("nombre")).append("\n");
@@ -145,12 +138,7 @@ public class Administrador extends JFrame {
                 sb.append("Telefono: ").append(rs.getString("telefono")).append("\n");
                 sb.append("Fecha de Nacimiento: ").append(rs.getString("fechaNacimiento")).append("\n\n");
             }
-
             displayArea.setText(sb.toString());
-
-            rs.close();
-            ps.close();
-            con.close();
         } catch (Exception ex) {
             ex.printStackTrace();
             displayArea.setText("Error al obtener pacientes.");
@@ -159,25 +147,17 @@ public class Administrador extends JFrame {
 
     // Método para ver reportes
     private void verReportes() {
-        try {
-            Connection con = getConnection();
-            String query = "SELECT * FROM Reportes";
-            PreparedStatement ps = con.prepareStatement(query);
-            ResultSet rs = ps.executeQuery();
-
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM Reportes");
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 sb.append("ID: ").append(rs.getInt("id")).append("\n");
                 sb.append("Tipo: ").append(rs.getString("tipo")).append("\n");
                 sb.append("Fecha de Generacion: ").append(rs.getString("fechaGeneracion")).append("\n");
                 sb.append("Descripcion: ").append(rs.getString("descripcion")).append("\n\n");
             }
-
             displayArea.setText(sb.toString());
-
-            rs.close();
-            ps.close();
-            con.close();
         } catch (Exception ex) {
             ex.printStackTrace();
             displayArea.setText("Error al obtener reportes.");
@@ -186,25 +166,17 @@ public class Administrador extends JFrame {
 
     // Método para gestionar personal médico
     private void gestionarPersonal() {
-        try {
-            Connection con = getConnection();
-            String query = "SELECT * FROM PersonalMedico";
-            PreparedStatement ps = con.prepareStatement(query);
-            ResultSet rs = ps.executeQuery();
-
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM PersonalMedico");
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 sb.append("ID: ").append(rs.getInt("id")).append("\n");
                 sb.append("Nombre: ").append(rs.getString("nombre")).append("\n");
                 sb.append("Apellido: ").append(rs.getString("apellido")).append("\n");
                 sb.append("Especialidad: ").append(rs.getString("especialidad")).append("\n\n");
             }
-
             displayArea.setText(sb.toString());
-
-            rs.close();
-            ps.close();
-            con.close();
         } catch (Exception ex) {
             ex.printStackTrace();
             displayArea.setText("Error al obtener personal médico.");
@@ -222,11 +194,6 @@ public class Administrador extends JFrame {
 
     public static void main(String[] args) {
         // Ejecutar la GUI en el hilo de despacho de eventos
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Administrador().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new Administrador().setVisible(true));
     }
 }

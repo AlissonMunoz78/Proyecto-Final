@@ -8,13 +8,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class HistorialMedico extends JFrame {
-    private JButton registerMedicalHistoryButton;
     private JButton viewMedicalHistoryButton;
     private JTextArea displayArea;
 
     public HistorialMedico() {
         // Configuración de la ventana principal
-        setTitle("Gestión de Historiales Médicos - MediCare");
+        setTitle("Historial Médico - MediCare");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -25,12 +24,10 @@ public class HistorialMedico extends JFrame {
 
         // Panel de botones
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(1, 2));
+        buttonPanel.setLayout(new GridLayout(1, 1));
 
-        registerMedicalHistoryButton = new JButton("Registrar Historial Médico");
         viewMedicalHistoryButton = new JButton("Ver Historial Médico");
 
-        buttonPanel.add(registerMedicalHistoryButton);
         buttonPanel.add(viewMedicalHistoryButton);
 
         // Área de visualización
@@ -45,13 +42,6 @@ public class HistorialMedico extends JFrame {
         add(panel);
 
         // Acciones de los botones
-        registerMedicalHistoryButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                registrarHistorialMedico();
-            }
-        });
-
         viewMedicalHistoryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -60,69 +50,39 @@ public class HistorialMedico extends JFrame {
         });
     }
 
-    // Método para registrar un nuevo historial médico
-    private void registrarHistorialMedico() {
-        JTextField patientIdField = new JTextField();
-        JTextField doctorIdField = new JTextField();
-        JTextField descriptionField = new JTextField();
+    // Método para ver el historial médico
+    private void verHistorialMedico() {
+        JTextField pacienteIdField = new JTextField();
 
-        Object[] fields = {
-                "ID del Paciente:", patientIdField,
-                "ID del Médico:", doctorIdField,
-                "Descripción:", descriptionField
+        Object[] message = {
+                "ID del Paciente:", pacienteIdField
         };
 
-        int option = JOptionPane.showConfirmDialog(this, fields, "Registrar Historial Médico", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, message, "Ver Historial Médico", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            int patientId = Integer.parseInt(patientIdField.getText());
-            int doctorId = Integer.parseInt(doctorIdField.getText());
-            String description = descriptionField.getText();
+            String pacienteId = pacienteIdField.getText().trim();
 
-            try {
-                Connection con = getConnection();
-                String query = "INSERT INTO HistorialesMedicos (pacienteId, medicoId, descripcion, fecha) VALUES (?, ?, ?, NOW())";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setInt(1, patientId);
-                ps.setInt(2, doctorId);
-                ps.setString(3, description);
-                ps.executeUpdate();
-
-                ps.close();
-                con.close();
-
-                displayArea.setText("Historial médico registrado con éxito.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                displayArea.setText("Error al registrar el historial médico.");
+            if (!pacienteId.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                try (Connection con = getConnection();
+                     PreparedStatement ps = con.prepareStatement("SELECT * FROM HistorialMedico WHERE pacienteId = ?")) {
+                    ps.setInt(1, Integer.parseInt(pacienteId));
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            sb.append("ID: ").append(rs.getInt("id")).append("\n");
+                            sb.append("Paciente ID: ").append(rs.getInt("pacienteId")).append("\n");
+                            sb.append("Fecha: ").append(rs.getString("fecha")).append("\n");
+                            sb.append("Descripción: ").append(rs.getString("descripcion")).append("\n\n");
+                        }
+                    }
+                    displayArea.setText(sb.toString());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    displayArea.setText("Error al obtener historial médico.");
+                }
+            } else {
+                displayArea.setText("Por favor, complete todos los campos.");
             }
-        }
-    }
-
-    // Método para ver los historiales médicos
-    private void verHistorialMedico() {
-        try {
-            Connection con = getConnection();
-            String query = "SELECT * FROM HistorialesMedicos";
-            PreparedStatement ps = con.prepareStatement(query);
-            ResultSet rs = ps.executeQuery();
-
-            StringBuilder sb = new StringBuilder();
-            while (rs.next()) {
-                sb.append("ID Historial: ").append(rs.getInt("id")).append("\n");
-                sb.append("ID Paciente: ").append(rs.getInt("pacienteId")).append("\n");
-                sb.append("ID Médico: ").append(rs.getInt("medicoId")).append("\n");
-                sb.append("Descripción: ").append(rs.getString("descripcion")).append("\n");
-                sb.append("Fecha: ").append(rs.getString("fecha")).append("\n\n");
-            }
-
-            displayArea.setText(sb.toString());
-
-            rs.close();
-            ps.close();
-            con.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            displayArea.setText("Error al obtener los historiales médicos.");
         }
     }
 
@@ -137,11 +97,6 @@ public class HistorialMedico extends JFrame {
 
     public static void main(String[] args) {
         // Ejecutar la GUI en el hilo de despacho de eventos
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new HistorialMedico().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new HistorialMedico().setVisible(true));
     }
 }

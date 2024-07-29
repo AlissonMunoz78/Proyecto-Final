@@ -16,17 +16,14 @@ public class Paciente extends JFrame {
     private JTextArea displayArea;
 
     public Paciente() {
-        // Configuración de la ventana principal
         setTitle("Paciente - MediCare");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Crear panel principal
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        // Panel de botones
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(1, 5));
 
@@ -42,18 +39,15 @@ public class Paciente extends JFrame {
         buttonPanel.add(viewExamResultsButton);
         buttonPanel.add(viewTreatmentsButton);
 
-        // Área de visualización
         displayArea = new JTextArea();
         displayArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(displayArea);
 
-        // Agregar paneles al marco
         panel.add(buttonPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         add(panel);
 
-        // Acciones de los botones
         viewInfoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -90,13 +84,12 @@ public class Paciente extends JFrame {
         });
     }
 
-    // Método para ver la información del paciente
     private void verInformacion() {
         try {
             Connection con = getConnection();
             String query = "SELECT * FROM Pacientes WHERE id = ?";
             PreparedStatement ps = con.prepareStatement(query);
-            ps.setInt(1, getPacienteId()); // Asumiendo que tienes una forma de obtener el ID del paciente actual
+            ps.setInt(1, getPacienteId());
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -122,13 +115,12 @@ public class Paciente extends JFrame {
         }
     }
 
-    // Método para ver las citas del paciente
     private void verCitas() {
         try {
             Connection con = getConnection();
             String query = "SELECT * FROM Citas WHERE pacienteId = ?";
             PreparedStatement ps = con.prepareStatement(query);
-            ps.setInt(1, getPacienteId()); // Asumiendo que tienes una forma de obtener el ID del paciente actual
+            ps.setInt(1, getPacienteId());
             ResultSet rs = ps.executeQuery();
 
             StringBuilder sb = new StringBuilder();
@@ -150,13 +142,12 @@ public class Paciente extends JFrame {
         }
     }
 
-    // Método para ver el historial médico del paciente
     private void verHistorialMedico() {
         try {
             Connection con = getConnection();
             String query = "SELECT * FROM HistorialesMedicos WHERE pacienteId = ?";
             PreparedStatement ps = con.prepareStatement(query);
-            ps.setInt(1, getPacienteId()); // Asumiendo que tienes una forma de obtener el ID del paciente actual
+            ps.setInt(1, getPacienteId());
             ResultSet rs = ps.executeQuery();
 
             StringBuilder sb = new StringBuilder();
@@ -178,13 +169,12 @@ public class Paciente extends JFrame {
         }
     }
 
-    // Método para ver los resultados de exámenes del paciente
     private void verResultadosExamen() {
         try {
             Connection con = getConnection();
             String query = "SELECT * FROM ResultadosExamenes WHERE pacienteId = ?";
             PreparedStatement ps = con.prepareStatement(query);
-            ps.setInt(1, getPacienteId()); // Asumiendo que tienes una forma de obtener el ID del paciente actual
+            ps.setInt(1, getPacienteId());
             ResultSet rs = ps.executeQuery();
 
             StringBuilder sb = new StringBuilder();
@@ -207,13 +197,12 @@ public class Paciente extends JFrame {
         }
     }
 
-    // Método para ver los tratamientos del paciente
     private void verTratamientos() {
         try {
             Connection con = getConnection();
             String query = "SELECT * FROM Tratamientos WHERE pacienteId = ?";
             PreparedStatement ps = con.prepareStatement(query);
-            ps.setInt(1, getPacienteId()); // Asumiendo que tienes una forma de obtener el ID del paciente actual
+            ps.setInt(1, getPacienteId());
             ResultSet rs = ps.executeQuery();
 
             StringBuilder sb = new StringBuilder();
@@ -237,29 +226,22 @@ public class Paciente extends JFrame {
         }
     }
 
-    // Método para obtener la conexión a la base de datos
-    public Connection getConnection() throws Exception {
-        String URL = "jdbc:mysql://localhost:3306/proyectofinal";
-        String USER = "root";
-        String PASSWORD = "password";
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    private Connection getConnection() throws Exception {
+        String url = "jdbc:mysql://localhost:3306/medicare";
+        String user = "root";
+        String password = "root";
+        return DriverManager.getConnection(url, user, password);
     }
 
-    // Método para obtener el ID del paciente (este es solo un ejemplo)
     private int getPacienteId() {
-        // Aquí deberías implementar la lógica para obtener el ID del paciente actual
-        // Por ejemplo, podrías solicitarlo al inicio de sesión o mantenerlo en una variable global
-        return 1; // Asumiendo que el ID del paciente es 1 para este ejemplo
+        // Debería devolver el ID del paciente autenticado
+        // Esto es un ejemplo, cambiar según la implementación
+        return 1;
     }
 
     public static void main(String[] args) {
-        // Ejecutar la GUI en el hilo de despacho de eventos
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Paciente().setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            new Paciente().setVisible(true);
         });
     }
 }

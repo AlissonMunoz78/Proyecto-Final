@@ -12,36 +12,29 @@ public class Reporte extends JFrame {
     private JTextArea displayArea;
 
     public Reporte() {
-        // Configuración de la ventana principal
         setTitle("Reportes Estadísticos - MediCare");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Crear panel principal
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        // Panel de botones
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(1, 1));
 
         viewAvailabilityButton = new JButton("Ver Disponibilidad de Médicos");
-
         buttonPanel.add(viewAvailabilityButton);
 
-        // Área de visualización
         displayArea = new JTextArea();
         displayArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(displayArea);
 
-        // Agregar paneles al marco
         panel.add(buttonPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         add(panel);
 
-        // Acciones de los botones
         viewAvailabilityButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -50,7 +43,6 @@ public class Reporte extends JFrame {
         });
     }
 
-    // Método para ver la disponibilidad de los médicos
     private void verDisponibilidadMedicos() {
         try {
             Connection con = getConnection();
@@ -80,7 +72,6 @@ public class Reporte extends JFrame {
         }
     }
 
-    // Método para obtener la conexión a la base de datos
     public Connection getConnection() throws Exception {
         String URL = "jdbc:mysql://localhost:3306/proyectofinal";
         String USER = "root";
@@ -90,7 +81,6 @@ public class Reporte extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Ejecutar la GUI en el hilo de despacho de eventos
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
