@@ -102,11 +102,11 @@ public class Login extends JFrame {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 1;
-        panel.add(new JLabel("Personal:"), gbc);
+        panel.add(new JLabel("Role:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        roleComboBox = new JComboBox<>(new String[]{"Administrativo", "Médico"});
+        roleComboBox = new JComboBox<>(new String[]{"Administrador", "Médico"});
         panel.add(roleComboBox, gbc);
 
         // Contenedor para los botones
