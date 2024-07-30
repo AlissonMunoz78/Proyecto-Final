@@ -114,4 +114,9 @@ public class Usuario extends JFrame {
     public int getId() {
         return 0;
     }
+
+    public String getNombre() {
+
+        return "";
+    }
 }

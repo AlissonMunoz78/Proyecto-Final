@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,140 +14,139 @@ public class Login extends JFrame {
     private JPasswordField passwordField;
     private JComboBox<String> roleComboBox;
     private JButton loginButton;
-    private JButton registerButton;
-    private JButton togglePasswordButton;
-    private boolean passwordVisible = false; // Estado del campo de contraseña
+    private JLabel togglePasswordLabel;
+    private boolean passwordVisible = false;
 
-    // Cargar imágenes para mostrar y ocultar la contraseña
-    private ImageIcon eyeIcon = new ImageIcon(getClass().getResource("/img/ojo.png"));
-    private ImageIcon eyeIconCrossed = new ImageIcon(getClass().getResource("/img/ojo-cruzado.png"));
+    private ImageIcon eyeIcon;
+    private ImageIcon eyeIconCrossed;
+    private ImageIcon userIcon;
+    private ImageIcon buildingIcon;
 
     public Login() {
+        loadIcons();
         setTitle("Login / Registro");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
         add(panel);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Título
+        // Título con icono de edificio
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.CENTER;
-        panel.add(new JLabel("Login / Registro"), gbc);
+        JLabel titleLabel = new JLabel("MediCare", buildingIcon, JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        panel.add(titleLabel, gbc);
 
-        // Imagen y campo de texto para el nombre de usuario
-        gbc.gridwidth = 1;
-        gbc.gridy++;
+        // Etiqueta y campo de nombre de usuario con icono
         gbc.gridx = 0;
-
-        // Cargar y redimensionar la imagen
-        ImageIcon userIcon = new ImageIcon(getClass().getResource("/img/usuario.png"));
-        Image userImg = userIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH); // Tamaño ajustado
-        userIcon = new ImageIcon(userImg);
-
-        // Panel para la imagen y el campo de texto
-        JPanel usernamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        JLabel imageLabel = new JLabel(userIcon);
-        usernameField = new JTextField(15); // Ajustar el tamaño del campo de texto
-
-        usernamePanel.add(imageLabel);
-        usernamePanel.add(usernameField);
-
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
         panel.add(new JLabel("Usuario:"), gbc);
+
         gbc.gridx = 1;
-        gbc.gridwidth = 2;
-        panel.add(usernamePanel, gbc);
-
-        // Campo de texto para la contraseña
-        gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridy = 1;
         gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        usernameField = new JTextField(15);
+        panel.add(usernameField, gbc);
 
-        // Panel para la contraseña y el botón de mostrar/ocultar
-        JPanel passwordPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        Image eyeImg = eyeIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH); // Tamaño ajustado
-        eyeIcon = new ImageIcon(eyeImg);
-        Image eyeCrossedImg = eyeIconCrossed.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH); // Tamaño ajustado
-        eyeIconCrossed = new ImageIcon(eyeCrossedImg);
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(new JLabel(userIcon), gbc);
 
-        togglePasswordButton = new JButton(eyeIcon);
-        togglePasswordButton.setBorder(BorderFactory.createEmptyBorder());
-        togglePasswordButton.setContentAreaFilled(false);
-        togglePasswordButton.setToolTipText("Mostrar/Ocultar Contraseña");
-        togglePasswordButton.addActionListener(new ActionListener() {
+        // Etiqueta y campo de contraseña con icono de ojo para mostrar/ocultar
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(new JLabel("Contraseña:"), gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        passwordField = new JPasswordField(15);
+        panel.add(passwordField, gbc);
+
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        togglePasswordLabel = new JLabel(eyeIcon);
+        togglePasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.add(togglePasswordLabel, gbc);
+
+        // Etiqueta y combobox para el rol
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(new JLabel("Rol:"), gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        roleComboBox = new JComboBox<>(new String[]{"Administrador", "Médico"});
+        roleComboBox.setPreferredSize(usernameField.getPreferredSize());
+        panel.add(roleComboBox, gbc);
+
+        // Botón de login
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        loginButton = new JButton("Iniciar Sesión");
+        panel.add(loginButton, gbc);
+
+        togglePasswordLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(java.awt.event.MouseEvent e) {
                 togglePasswordVisibility();
             }
         });
 
-        passwordField = new JPasswordField(15); // Ajustar el tamaño del campo de texto
-        passwordPanel.add(togglePasswordButton);
-        passwordPanel.add(passwordField);
-
-        panel.add(new JLabel("Contraseña:"), gbc);
-        gbc.gridx = 1;
-        gbc.gridwidth = 2;
-        panel.add(passwordPanel, gbc);
-
-        // ComboBox para el rol (admin, medico, etc.)
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        panel.add(new JLabel("Role:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridwidth = 2;
-        roleComboBox = new JComboBox<>(new String[]{"Administrador", "Médico"});
-        panel.add(roleComboBox, gbc);
-
-        // Contenedor para los botones
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        loginButton = new JButton("Login");
-        loginButton.setPreferredSize(new Dimension(100, 30)); // Tamaño más pequeño
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 handleLogin();
             }
         });
-        buttonPanel.add(loginButton);
+    }
 
-        registerButton = new JButton("Register");
-        registerButton.setPreferredSize(new Dimension(100, 30)); // Tamaño más pequeño
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleRegister();
-            }
-        });
-        buttonPanel.add(registerButton);
+    private void loadIcons() {
+        eyeIcon = loadImage("/img/ojo.png", 24, 24);
+        eyeIconCrossed = loadImage("/img/ojo-cruzado.png", 24, 24);
+        userIcon = loadImage("/img/usuario.png", 24, 24);
+        buildingIcon = loadImage("/img/edificio.png", 24, 24);
+    }
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 3;
-        panel.add(buttonPanel, gbc);
+    private ImageIcon loadImage(String path, int width, int height) {
+        URL imgURL = getClass().getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(new ImageIcon(imgURL).getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo encontrar el archivo: " + path);
+            return null;
+        }
     }
 
     private void togglePasswordVisibility() {
         passwordVisible = !passwordVisible;
         if (passwordVisible) {
-            // Mostrar la contraseña
             passwordField.setEchoChar((char) 0);
-            togglePasswordButton.setIcon(eyeIconCrossed); // Cambiar imagen a cruzada
+            togglePasswordLabel.setIcon(eyeIconCrossed);
         } else {
-            // Ocultar la contraseña
             passwordField.setEchoChar('*');
-            togglePasswordButton.setIcon(eyeIcon); // Cambiar imagen a normal
+            togglePasswordLabel.setIcon(eyeIcon);
         }
     }
 
@@ -179,28 +179,6 @@ public class Login extends JFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error al conectar con la base de datos.");
-        }
-    }
-
-    private void handleRegister() {
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
-        String role = (String) roleComboBox.getSelectedItem();
-
-        try {
-            Connection con = DatabaseConnection.getConnection();
-            String query = "INSERT INTO Usuarios (username, password, rol) VALUES (?, ?, ?)";
-            PreparedStatement ps = con.prepareStatement(query);
-            ps.setString(1, username);
-            ps.setString(2, password);
-            ps.setString(3, role);
-            ps.executeUpdate();
-
-            JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente.");
-            con.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error al registrar el usuario.");
         }
     }
 

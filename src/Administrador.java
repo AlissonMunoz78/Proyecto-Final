@@ -1,45 +1,94 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.*;
 
-public class Administrador extends JFrame {
-    private JButton viewDoctorsButton;
-    private JButton viewReportsButton;
+public class Administrador extends JFrame{
+    private JButton registrarPacienteButton;
+    private JButton buscarPacienteButton;
+    private JButton eliminarPacienteButton;
+    private JButton salirButton;
+    private JButton actualizarPacienteButton;
+    private JPanel menu;
 
     public Administrador() {
-        setTitle("Panel de Administrador - MediCare");
-        setSize(400, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setTitle("Menu");
+        setSize(650,600);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 1));
+        menu = new JPanel(new GridLayout(4, 3, 20, 20));
+        menu.setBackground(Color.GRAY);
+        menu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        viewDoctorsButton = new JButton("Ver Médicos");
-        viewReportsButton = new JButton("Ver Reportes");
+        // Iconos
+        ImageIcon hospitalIcon = new ImageIcon("img/edificio.png"); // Reemplaza con la ruta de tu imagen
+        ImageIcon registrarIcon = new ImageIcon("img/agregar.png"); // Reemplaza con la ruta de tu imagen
+        ImageIcon buscarIcon = new ImageIcon("img/busqueda.png"); // Reemplaza con la ruta de tu imagen
+        ImageIcon eliminarIcon = new ImageIcon("img/medico.png"); // Reemplaza con la ruta de tu imagen
+        ImageIcon reportesIcon = new ImageIcon("img/reportes.png"); // Reemplaza con la ruta de tu imagen
 
-        panel.add(viewDoctorsButton);
-        panel.add(viewReportsButton);
+        // Botones
+        registrarPacienteButton = new JButton("Registrar Paciente", registrarIcon);
+        registrarPacienteButton.setHorizontalTextPosition(JButton.RIGHT);
+        registrarPacienteButton.setVerticalTextPosition(JButton.CENTER);
+        buscarPacienteButton = new JButton("Buscar Paciente", buscarIcon);
+        buscarPacienteButton.setHorizontalTextPosition(JButton.RIGHT);
+        buscarPacienteButton.setVerticalTextPosition(JButton.CENTER);
+        eliminarPacienteButton = new JButton("Reportes", reportesIcon);
+        eliminarPacienteButton.setHorizontalTextPosition(JButton.RIGHT);
+        eliminarPacienteButton.setVerticalTextPosition(JButton.CENTER);
+        actualizarPacienteButton = new JButton("Buscar Médico");
+        salirButton = new JButton("Salir");
 
-        add(panel);
+        // Agregar botones al panel
+        menu.add(new JLabel(hospitalIcon));
+        menu.add(new JLabel());
+        menu.add(new JLabel());
 
-        viewDoctorsButton.addActionListener(new ActionListener() {
+        menu.add(registrarPacienteButton);
+        menu.add(new JLabel());
+        menu.add(buscarPacienteButton);
+
+        menu.add(actualizarPacienteButton);
+        menu.add(new JLabel());
+        menu.add(eliminarPacienteButton);
+
+        menu.add(new JLabel());
+        menu.add(new JLabel());
+        menu.add(salirButton);
+
+        setContentPane(menu);
+
+        registrarPacienteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new PersonalMedico(null).setVisible(true);
+                new registrarPaciente().setVisible(true);
+                dispose();
             }
         });
-
-        viewReportsButton.addActionListener(new ActionListener() {
+        actualizarPacienteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new Reporte().setVisible(true);
+                new buscarmedico().setVisible(true);
             }
         });
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Administrador().setVisible(true));
+        buscarPacienteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new buscarpaciente().setVisible(true);
+            }
+        });
+        eliminarPacienteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Reportes2().setVisible(true);
+            }
+        });
+        salirButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
     }
 }
