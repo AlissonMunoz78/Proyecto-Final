@@ -1,10 +1,10 @@
-import database.DatabaseConnection;
+import database.ConexionBaseDatos;
 
 import javax.swing.*;
-import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ResultadoExamen extends JFrame {
     private JTextArea displayArea;
@@ -24,10 +24,11 @@ public class ResultadoExamen extends JFrame {
     }
 
     private void loadExamResults() {
-        try (Connection con = DatabaseConnection.getConnection()) {
-            String query = "SELECT * FROM ResultadosExamen";
-            PreparedStatement ps = con.prepareStatement(query);
-            ResultSet rs = ps.executeQuery();
+        String query = "SELECT * FROM ResultadosExamen";
+
+        try (Connection con = ConexionBaseDatos.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
 
             StringBuilder sb = new StringBuilder();
             while (rs.next()) {
@@ -37,9 +38,10 @@ public class ResultadoExamen extends JFrame {
             }
 
             displayArea.setText(sb.toString());
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
             displayArea.setText("Error al recuperar los resultados de los exámenes.");
+            JOptionPane.showMessageDialog(this, "Error al recuperar los resultados de los exámenes: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

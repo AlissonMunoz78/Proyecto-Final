@@ -85,6 +85,7 @@ public class PersonalMedico extends JFrame {
         setButtonSize(salirButton);
         panel.add(salirButton, gbc);
 
+        // Configuración de los botones
         registerAppointmentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -116,7 +117,7 @@ public class PersonalMedico extends JFrame {
         salirButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose();
+                dispose(); // Cierra la ventana actual
             }
         });
     }
@@ -127,7 +128,7 @@ public class PersonalMedico extends JFrame {
         resultsIcon = loadImage("/img/examenes.png", 24, 24);
         treatmentIcon = loadImage("/img/capsulas.png", 24, 24);
         exitIcon = loadImage("/img/exit.png", 24, 24);
-        buildingIcon = loadImage("/img/edificio.png", 32, 32); // Ajusta el tamaño según lo necesites
+        buildingIcon = loadImage("/img/edificio.png", 32, 32); // Ajusta el tamaño según sea necesario
     }
 
     private ImageIcon loadImage(String path, int width, int height) {

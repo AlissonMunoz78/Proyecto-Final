@@ -38,6 +38,7 @@ public class buscarpaciente extends JFrame {
                 dispose();
             }
         });
+
         menúButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -48,13 +49,16 @@ public class buscarpaciente extends JFrame {
     }
 
     private void buscarPaciente(String cedula) {
-        Connection connection = ConexionBaseDatos.getConnection();
-        String query = "SELECT * FROM PACIENTE WHERE cedula = ?";
-
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            connection = ConexionBaseDatos.getConnection();
+            String query = "SELECT * FROM PACIENTE WHERE cedula = ?";
+
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, cedula);
-            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
                 String resultado = "Cédula: " + resultSet.getString("cedula") +
@@ -69,12 +73,17 @@ public class buscarpaciente extends JFrame {
             } else {
                 areaResultado.setText("Paciente no encontrado");
             }
-
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            areaResultado.setText("Error al conectar con la base de datos.");
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

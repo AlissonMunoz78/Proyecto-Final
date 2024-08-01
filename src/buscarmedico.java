@@ -20,7 +20,7 @@ public class buscarmedico extends JFrame {
     private JButton botonBuscar;
     private JTextArea areaResultado;
     private JButton menúButton;
-    private JComboBox comboBox1;
+    private JComboBox<String> comboBox1;
 
     public buscarmedico() {
         setTitle("Actualizar Paciente");
@@ -50,13 +50,29 @@ public class buscarmedico extends JFrame {
                 dispose();
             }
         });
+
+        // Asumiendo que el botonBuscar y menúButton tienen funciones adicionales.
+        botonBuscar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Implementar búsqueda de médico aquí.
+            }
+        });
+
+        menúButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Implementar acción para menú aquí.
+            }
+        });
     }
 
     private void actualizarPaciente(String cedula, String nombre, String apellido, String telefono, int edad, String descripcionEnfermedad) {
-        Connection connection = ConexionBaseDatos.getConnection();
-        String query = "UPDATE PACIENTE SET nombre = ?, apellido = ?, telefono = ?, edad = ?, descripcion_enfermedad = ? WHERE cedula = ?";
-
+        Connection connection = null;
         try {
+            connection = ConexionBaseDatos.getConnection();
+            String query = "UPDATE PACIENTE SET nombre = ?, apellido = ?, telefono = ?, edad = ?, descripcion_enfermedad = ? WHERE cedula = ?";
+
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, nombre);
             preparedStatement.setString(2, apellido);
@@ -73,9 +89,17 @@ public class buscarmedico extends JFrame {
             }
 
             preparedStatement.close();
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al conectar con la base de datos.");
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

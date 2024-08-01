@@ -1,4 +1,4 @@
-import database.DatabaseConnection;
+import database.ConexionBaseDatos;
 
 import javax.swing.*;
 import java.awt.*;
@@ -156,7 +156,7 @@ public class Login extends JFrame {
         String role = (String) roleComboBox.getSelectedItem();
 
         try {
-            Connection con = DatabaseConnection.getConnection();
+            Connection con = ConexionBaseDatos.getConnection();
             String query = "SELECT * FROM Usuarios WHERE username = ? AND password = ? AND rol = ?";
             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, username);

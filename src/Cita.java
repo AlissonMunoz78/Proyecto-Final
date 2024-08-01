@@ -1,4 +1,4 @@
-import database.DatabaseConnection;
+import database.ConexionBaseDatos;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,13 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 public class Cita extends JFrame {
     private Usuario medico;
     private JTextField campoEdad;
     private JButton botonRegistrar;
-    private JComboBox<String> comboBox1;
     private ImageIcon buildingIcon;
 
     public Cita(Usuario medico) {
@@ -70,28 +68,33 @@ public class Cita extends JFrame {
         registrarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int pacienteId = Integer.parseInt(pacienteIdField.getText());
-                String fecha = fechaField.getText();
-                String hora = horaField.getText();
-                String especialidad = (String) especialidadComboBox.getSelectedItem();
-                int edad = Integer.parseInt(campoEdad.getText());
+                try {
+                    int pacienteId = Integer.parseInt(pacienteIdField.getText());
+                    String fecha = fechaField.getText();
+                    String hora = horaField.getText();
+                    String especialidad = (String) especialidadComboBox.getSelectedItem();
+                    int edad = Integer.parseInt(campoEdad.getText());
 
-                try (Connection con = DatabaseConnection.getConnection()) {
                     if (especialidad.equals("Pediatría") && edad >= 12) {
                         JOptionPane.showMessageDialog(null, "La especialidad Pediatría solo es válida para pacientes menores de 12 años.");
                         return;
                     }
 
-                    String query = "INSERT INTO Citas (paciente_id, medico_id, fecha, hora, especialidad) VALUES (?, ?, ?, ?, ?)";
-                    PreparedStatement ps = con.prepareStatement(query);
-                    ps.setInt(1, pacienteId);
-                    ps.setInt(2, medico.getId());
-                    ps.setString(3, fecha);
-                    ps.setString(4, hora);
-                    ps.setString(5, especialidad);
-                    ps.executeUpdate();
+                    try (Connection con = ConexionBaseDatos.getConnection()) {
+                        String query = "INSERT INTO Citas (paciente_id, medico_id, fecha, hora, especialidad) VALUES (?, ?, ?, ?, ?)";
+                        try (PreparedStatement ps = con.prepareStatement(query)) {
+                            ps.setInt(1, pacienteId);
+                            ps.setInt(2, medico.getId());
+                            ps.setString(3, fecha);
+                            ps.setString(4, hora);
+                            ps.setString(5, especialidad);
+                            ps.executeUpdate();
 
-                    JOptionPane.showMessageDialog(null, "Cita registrada con éxito.");
+                            JOptionPane.showMessageDialog(null, "Cita registrada con éxito.");
+                        }
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Por favor, ingrese valores válidos en los campos numéricos.");
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Error al registrar la cita.");

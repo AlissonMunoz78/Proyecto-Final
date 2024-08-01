@@ -1,4 +1,4 @@
-import database.DatabaseConnection;
+import database.ConexionBaseDatos;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,13 +7,14 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Usuario extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JComboBox<String> roleComboBox;
 
-    public Usuario(int i, String medico, String medico123, String s) {
+    public Usuario() {
         setTitle("Login / Registro - MediCare");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,37 +54,36 @@ public class Usuario extends JFrame {
         panel.add(registerButton);
     }
 
-    public Usuario(boolean b) {
-        setVisible(b);
-    }
-
     private void handleLogin() {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
         String role = (String) roleComboBox.getSelectedItem();
 
-        try (Connection con = DatabaseConnection.getConnection()) {
-            String query = "SELECT * FROM Usuarios WHERE username = ? AND password = ? AND rol = ?";
-            PreparedStatement ps = con.prepareStatement(query);
+        String query = "SELECT * FROM Usuarios WHERE username = ? AND password = ? AND rol = ?";
+
+        try (Connection con = ConexionBaseDatos.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
             ps.setString(1, username);
             ps.setString(2, password);
             ps.setString(3, role);
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                if (role.equals("Administrador")) {
-                    new Administrador().setVisible(true);
-                } else if (role.equals("Médico")) {
-                    Usuario medico = new Usuario(rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getString("rol"));
-                    new PersonalMedico(medico).setVisible(true);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    if (role.equals("Administrador")) {
+                        new Administrador().setVisible(true);
+                    } else if (role.equals("Médico")) {
+                        Usuario medico = new Usuario();
+                        new PersonalMedico(medico).setVisible(true);
+                    }
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Credenciales incorrectas.");
                 }
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(null, "Credenciales incorrectas.");
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error al conectar con la base de datos.");
+            JOptionPane.showMessageDialog(this, "Error al conectar con la base de datos.");
         }
     }
 
@@ -92,31 +92,24 @@ public class Usuario extends JFrame {
         String password = new String(passwordField.getPassword());
         String role = (String) roleComboBox.getSelectedItem();
 
-        try (Connection con = DatabaseConnection.getConnection()) {
-            String query = "INSERT INTO Usuarios (username, password, rol) VALUES (?, ?, ?)";
-            PreparedStatement ps = con.prepareStatement(query);
+        String query = "INSERT INTO Usuarios (username, password, rol) VALUES (?, ?, ?)";
+
+        try (Connection con = ConexionBaseDatos.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
             ps.setString(1, username);
             ps.setString(2, password);
             ps.setString(3, role);
-            ps.executeUpdate();
 
-            JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente.");
-        } catch (Exception ex) {
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Usuario registrado exitosamente.");
+        } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error al registrar el usuario.");
+            JOptionPane.showMessageDialog(this, "Error al registrar el usuario.");
         }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Usuario(2, "medico", "medico123", "medico").setVisible(true));
-    }
-
-    public int getId() {
-        return 0;
-    }
-
-    public String getNombre() {
-
-        return "";
+        SwingUtilities.invokeLater(() -> new Usuario().setVisible(true));
     }
 }

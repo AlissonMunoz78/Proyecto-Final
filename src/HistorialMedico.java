@@ -1,4 +1,4 @@
-import database.DatabaseConnection;
+import database.ConexionBaseDatos;
 
 import javax.swing.*;
 import java.sql.Connection;
@@ -26,20 +26,29 @@ public class HistorialMedico extends JFrame {
     }
 
     private void loadMedicalHistory() {
-        try (Connection con = DatabaseConnection.getConnection()) {
-            String query = "SELECT * FROM HistorialMedico WHERE medico_id = ?";
-            PreparedStatement ps = con.prepareStatement(query);
+        String query = "SELECT * FROM HistorialMedico WHERE medico_id = ?";
+
+        try (Connection con = ConexionBaseDatos.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
             ps.setInt(1, medico.getId());
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
+                StringBuilder sb = new StringBuilder();
+                boolean hasResults = false;
 
-            StringBuilder sb = new StringBuilder();
-            while (rs.next()) {
-                sb.append("ID del Paciente: ").append(rs.getInt("paciente_id")).append("\n");
-                sb.append("Fecha: ").append(rs.getDate("fecha")).append("\n");
-                sb.append("Descripción: ").append(rs.getString("descripcion")).append("\n\n");
+                while (rs.next()) {
+                    sb.append("ID del Paciente: ").append(rs.getInt("paciente_id")).append("\n");
+                    sb.append("Fecha: ").append(rs.getDate("fecha")).append("\n");
+                    sb.append("Descripción: ").append(rs.getString("descripcion")).append("\n\n");
+                    hasResults = true;
+                }
+
+                if (!hasResults) {
+                    sb.append("No se encontraron registros.");
+                }
+
+                displayArea.setText(sb.toString());
             }
-
-            displayArea.setText(sb.toString());
         } catch (Exception ex) {
             ex.printStackTrace();
             displayArea.setText("Error al recuperar el historial médico.");
