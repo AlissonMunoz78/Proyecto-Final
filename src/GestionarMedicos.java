@@ -34,12 +34,12 @@ public class GestionarMedicos extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new BuscarDoctor();
-
             }
         });
         amedico.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 new ActualizarDoctor();
             }
         });
