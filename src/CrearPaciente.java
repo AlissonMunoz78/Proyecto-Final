@@ -7,7 +7,6 @@ import java.sql.*;
 public class CrearPaciente extends JFrame {
     private JPanel panelCrearPaciente;
     private JTextField nombreTextField;
-    private JTextField apellidoTextField;
     private JTextField lugarNacimientoTextField;
     private JTextField edadTextField;
     private JTextField generoTextField;
@@ -19,10 +18,9 @@ public class CrearPaciente extends JFrame {
         super("Crear Paciente");
 
         panelCrearPaciente = new JPanel();
-        panelCrearPaciente.setLayout(new GridLayout(7, 2));
+        panelCrearPaciente.setLayout(new GridLayout(6, 2));
 
         nombreTextField = new JTextField();
-        apellidoTextField = new JTextField();
         lugarNacimientoTextField = new JTextField();
         edadTextField = new JTextField();
         generoTextField = new JTextField();
@@ -33,8 +31,6 @@ public class CrearPaciente extends JFrame {
         // Añadir componentes al panel
         panelCrearPaciente.add(new JLabel("Nombre:"));
         panelCrearPaciente.add(nombreTextField);
-        panelCrearPaciente.add(new JLabel("Apellido:"));
-        panelCrearPaciente.add(apellidoTextField);
         panelCrearPaciente.add(new JLabel("Lugar de Nacimiento:"));
         panelCrearPaciente.add(lugarNacimientoTextField);
         panelCrearPaciente.add(new JLabel("Edad:"));
@@ -76,33 +72,37 @@ public class CrearPaciente extends JFrame {
     }
 
     private void guardarPaciente() {
-        String nombre = nombreTextField.getText().trim();
-        String apellido = apellidoTextField.getText().trim();
+        String nombres = nombreTextField.getText().trim();
         String lugarNacimiento = lugarNacimientoTextField.getText().trim();
-        String edad = edadTextField.getText().trim();
+        String edadStr = edadTextField.getText().trim();
         String genero = generoTextField.getText().trim();
         String telefono = telefonoTextField.getText().trim();
 
-        if (nombre.isEmpty() || apellido.isEmpty() || lugarNacimiento.isEmpty() ||
-                edad.isEmpty() || genero.isEmpty() || telefono.isEmpty()) {
+        if (nombres.isEmpty() || lugarNacimiento.isEmpty() ||
+                edadStr.isEmpty() || genero.isEmpty() || telefono.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        try (Connection connection = conexionBase()) {
-            String sql = "INSERT INTO Pacientes (nombre, apellido, lugar_nacimiento, edad, genero, telefono) VALUES (?, ?, ?, ?, ?, ?)";
-            PreparedStatement pst = connection.prepareStatement(sql);
-            pst.setString(1, nombre);
-            pst.setString(2, apellido);
-            pst.setString(3, lugarNacimiento);
-            pst.setString(4, edad);
-            pst.setString(5, genero);
-            pst.setString(6, telefono);
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Paciente creado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            dispose();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error al crear el paciente: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        try {
+            int edad = Integer.parseInt(edadStr); // Convertir edad a entero
+
+            try (Connection connection = conexionBase()) {
+                String sql = "INSERT INTO Pacientes (nombres, lugar_nacimiento, edad, genero, telefono) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement pst = connection.prepareStatement(sql);
+                pst.setString(1, nombres);
+                pst.setString(2, lugarNacimiento);
+                pst.setInt(3, edad);
+                pst.setString(4, genero);
+                pst.setString(5, telefono);
+                pst.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Paciente creado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Error al crear el paciente: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "La edad debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

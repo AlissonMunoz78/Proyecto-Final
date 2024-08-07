@@ -38,10 +38,10 @@ public class HistorialMedico extends JFrame {
 
     // Método para buscar historial médico
     private void buscarHistorial() {
-        String nombre = nombreBuscar.getText().trim();
+        String nombres = nombreBuscar.getText().trim();
 
         // Verificar si el campo está vacío
-        if (nombre.isEmpty()) {
+        if (nombres.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, ingrese el nombre del paciente.");
             return;
         }
@@ -56,21 +56,21 @@ public class HistorialMedico extends JFrame {
             // Consulta para obtener el paciente_id
             String sqlPaciente = "SELECT id FROM Pacientes WHERE nombres = ?";
             stmt = conn.prepareStatement(sqlPaciente);
-            stmt.setString(1, nombre);
+            stmt.setString(1, nombres);
             rs = stmt.executeQuery();
 
             if (rs.next()) {
                 int pacienteId = rs.getInt("id");
 
                 // Limpiar etiquetas
-                npaciente.setText("Nombre del Paciente: " + nombre);
+                npaciente.setText("Nombres del Paciente: " + nombres);
                 hpaciente.setText(""); // Limpiar información adicional anterior
 
                 // Limpiar área de texto antes de agregar nuevos resultados
                 descripcion.setText("");
 
                 // Consulta para obtener el historial médico del paciente por paciente_id
-                String sqlHistorial = "SELECT d.nombre AS doctor_nombre, h.descripcion AS enfermedad " +
+                String sqlHistorial = "SELECT d.nombres AS doctor_nombre, h.descripcion AS enfermedad " +
                         "FROM HistorialMedico h " +
                         "JOIN Medicos d ON h.medico_id = d.id " +
                         "WHERE h.paciente_id = ?";

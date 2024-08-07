@@ -66,24 +66,23 @@ public class BuscarPaciente extends JFrame {
     }
 
     private void buscarPaciente() {
-        String nombre = nombreTextField.getText();
+        String nombres = nombreTextField.getText();
 
-        if (nombre.isEmpty()) {
+        if (nombres.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Por favor, ingrese el nombre del paciente a buscar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try (Connection connection = conexionBase()) {
-            String sql = "SELECT * FROM Pacientes WHERE nombre LIKE ?";
+            String sql = "SELECT * FROM Pacientes WHERE nombres LIKE ?";
             PreparedStatement pst = connection.prepareStatement(sql);
-            pst.setString(1, "%" + nombre + "%");
+            pst.setString(1, "%" + nombres + "%");
             ResultSet rs = pst.executeQuery();
 
             StringBuilder resultado = new StringBuilder();
             while (rs.next()) {
                 resultado.append("ID: ").append(rs.getInt("id")).append("\n")
-                        .append("Nombre: ").append(rs.getString("nombre")).append("\n")
-                        .append("Apellido: ").append(rs.getString("apellido")).append("\n")
+                        .append("Nombres: ").append(rs.getString("nombres")).append("\n")
                         .append("Lugar de Nacimiento: ").append(rs.getString("lugar_nacimiento")).append("\n")
                         .append("Edad: ").append(rs.getInt("edad")).append("\n")
                         .append("Género: ").append(rs.getString("genero")).append("\n")
@@ -91,7 +90,7 @@ public class BuscarPaciente extends JFrame {
             }
 
             if (resultado.length() == 0) {
-                resultado.append("No se encontraron pacientes con el nombre: ").append(nombre);
+                resultado.append("No se encontraron pacientes con el nombre: ").append(nombres);
             }
 
             resultadoTextArea.setText(resultado.toString());

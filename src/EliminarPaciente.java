@@ -37,16 +37,14 @@ public class EliminarPaciente extends JFrame {
 
 
         JPanel buscarPanel = new JPanel();
-        buscarPanel.add(new JLabel("Nombre a buscar:"));
+        buscarPanel.add(new JLabel("Nombres a buscar:"));
         buscarPanel.add(nombreBuscarTextField);
         buscarPanel.add(buscarButton);
 
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new GridLayout(10, 2));
-        inputPanel.add(new JLabel("Nombre:"));
+        inputPanel.add(new JLabel("Nombres:"));
         inputPanel.add(nombreTextField);
-        inputPanel.add(new JLabel("Apellido:"));
-        inputPanel.add(apellidoTextField);
         inputPanel.add(new JLabel("Lugar de Nacimiento:"));
         inputPanel.add(lugar_nacimientoTextField);
         inputPanel.add(new JLabel("Edad:"));
@@ -105,19 +103,18 @@ public class EliminarPaciente extends JFrame {
         String idBuscar = nombreBuscarTextField.getText().trim();
 
         if (idBuscar.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor, ingrese el nombre del paciente a buscar.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Por favor, ingrese el nombres del paciente a buscar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try (Connection connection = conexion_base()) {
-            String sql = "SELECT * FROM Pacientes WHERE nombre LIKE ?";
+            String sql = "SELECT * FROM Pacientes WHERE nombres LIKE ?";
             PreparedStatement pst = connection.prepareStatement(sql);
             pst.setString(1, idBuscar);
             ResultSet rs = pst.executeQuery();
 
             if (rs.next()) {
-                nombreTextField.setText(rs.getString("nombre"));
-                apellidoTextField.setText(rs.getString("apellido"));
+                nombreTextField.setText(rs.getString("nombres"));
                 lugar_nacimientoTextField.setText(rs.getString("lugar_nacimiento"));
                 edadTextField.setText(rs.getString("edad"));
                 generoTextField.setText(rs.getString("genero"));
@@ -141,7 +138,7 @@ public class EliminarPaciente extends JFrame {
         int confirm = JOptionPane.showConfirmDialog(null, "¿Está seguro de eliminar al paciente con ID " + id + "?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try (Connection connection = conexion_base()) {
-                String sql = "DELETE FROM Pacientes WHERE nombre = ?";
+                String sql = "DELETE FROM Pacientes WHERE nombres = ?";
                 PreparedStatement pst = connection.prepareStatement(sql);
                 pst.setString(1, id);
                 int rowsDeleted = pst.executeUpdate();

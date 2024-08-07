@@ -16,9 +16,13 @@ public class RegistrarCita extends JFrame {
     private JButton guardarCitaButton;
     private JButton cancelarButton;
     private JLabel idpaciente;
+    private JFrame ventanaAnterior; // Añadido para referencia a la ventana anterior
 
-    public RegistrarCita() {
+    // Constructor que recibe una referencia a la ventana anterior
+    public RegistrarCita(JFrame ventanaAnterior) {
         super("Registrar Cita");
+        this.ventanaAnterior = ventanaAnterior; // Guarda la referencia
+
         setContentPane(panelcita);
         setSize(500, 300);
         setResizable(false);
@@ -43,23 +47,31 @@ public class RegistrarCita extends JFrame {
         cancelarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose();
+                cancelar();
             }
         });
     }
 
+    // Método para cerrar la ventana actual y regresar a la anterior
+    private void cancelar() {
+        dispose();
+        if (ventanaAnterior != null) {
+            ventanaAnterior.setVisible(true); // Muestra la ventana anterior
+        }
+    }
+
     // Método para buscar paciente
     private void buscarPaciente() {
-        String nombre = nombreBuscar.getText();
+        String nombres = nombreBuscar.getText();
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try {
             conn = conexion_base();
-            String sql = "SELECT id FROM Pacientes WHERE nombre = ?";
+            String sql = "SELECT id FROM Pacientes WHERE nombres = ?";
             stmt = conn.prepareStatement(sql);
-            stmt.setString(1, nombre);
+            stmt.setString(1, nombres);
             rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -105,10 +117,10 @@ public class RegistrarCita extends JFrame {
 
         try {
             conn = conexion_base();
-            String sql = "INSERT INTO Citas (paciente_id, medico_id, fecha, hora,  especialidad) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO Citas (paciente_id, medico_id, fecha, hora, especialidad) VALUES (?, ?, ?, ?, ?)";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, Integer.parseInt(pacienteId));
-            stmt.setInt(2, 1);
+            stmt.setInt(2, 1); // Reemplaza con el ID del médico real
             stmt.setDate(3, Date.valueOf(fecha));
             stmt.setTime(4, Time.valueOf(hora));
             stmt.setString(5, especialidad);
@@ -156,6 +168,8 @@ public class RegistrarCita extends JFrame {
     }
 
     public static void main(String[] args) {
-        new RegistrarCita();
+        // Supón que `ventanaAnterior` es la ventana que estaba activa antes de abrir `RegistrarCita`.
+        JFrame ventanaAnterior = new JFrame("Ventana Anterior"); // Reemplaza con la ventana real
+        new RegistrarCita(ventanaAnterior);
     }
 }

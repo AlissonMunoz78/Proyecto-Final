@@ -26,7 +26,7 @@ public class CrearDoctor extends JFrame {
         guardarButton = new JButton("Guardar");
         cancelarButton = new JButton("Cancelar");
 
-        panelcreardoctor.add(new JLabel("Nombre:"));
+        panelcreardoctor.add(new JLabel("Nombres:"));
         panelcreardoctor.add(nombreTextField);
         panelcreardoctor.add(new JLabel("Especialidad:"));
         panelcreardoctor.add(especialidadComboBox);
@@ -69,20 +69,20 @@ public class CrearDoctor extends JFrame {
     }
 
     private void guardarDoctor() {
-        String nombre = nombreTextField.getText().trim();
+        String nombres = nombreTextField.getText().trim();
         String especialidad = (String) especialidadComboBox.getSelectedItem();
         String horarioMañana = horarioMañanaTextField.getText().trim();
         String horarioTarde = horarioTardeTextField.getText().trim();
 
-        if (nombre.isEmpty() || especialidad.isEmpty() || horarioMañana.isEmpty() || horarioTarde.isEmpty()) {
+        if (nombres.isEmpty() || especialidad.isEmpty() || horarioMañana.isEmpty() || horarioTarde.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try (Connection connection = conexion_base()) {
-            String sql = "INSERT INTO medicos (nombre, especialidad, horario_mañana, horario_tarde) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO medicos (nombres, especialidad, horario_mañana, horario_tarde) VALUES (?, ?, ?, ?)";
             PreparedStatement pst = connection.prepareStatement(sql);
-            pst.setString(1, nombre);
+            pst.setString(1, nombres);
             pst.setString(2, especialidad);
             pst.setString(3, horarioMañana);
             pst.setString(4, horarioTarde);

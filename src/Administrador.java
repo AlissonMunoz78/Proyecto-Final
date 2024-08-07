@@ -13,7 +13,7 @@ public class Administrador extends JFrame {
     public Administrador() {
         super("Menu Administrador");
         setContentPane(paneladmin);
-        setSize(500,400);
+        setSize(500, 400);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,32 +23,37 @@ public class Administrador extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new GestionarMedicos();
-
+                new GestionarMedicos().setVisible(true); // Asegúrate de mostrar la ventana
             }
         });
+
         reportesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new Reportes();
+                new Reportes().setVisible(true); // Asegúrate de mostrar la ventana
             }
         });
+
         Gpacientes.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new GestionarPacientes();
+                new GestionarPacientes().setVisible(true); // Asegúrate de mostrar la ventana
             }
         });
+
         salir.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int confirm = JOptionPane.showConfirmDialog(null, "¿Desea Salir del Sistema?", "Confirmar Salida", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     dispose();
-                    new Login();
+                    new Login().setVisible(true); // Asegúrate de mostrar la ventana
                 }
-
             }
         });
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new Administrador().setVisible(true));
     }
 }

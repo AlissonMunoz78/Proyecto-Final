@@ -39,7 +39,7 @@ public class EliminarDoctor extends JFrame {
 
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new GridLayout(5, 2));
-        inputPanel.add(new JLabel("Nombre:"));
+        inputPanel.add(new JLabel("Nombres:"));
         inputPanel.add(nombreTextField);
         inputPanel.add(new JLabel("Especialidad:"));
         inputPanel.add(especialidadComboBox);
@@ -102,7 +102,7 @@ public class EliminarDoctor extends JFrame {
         }
 
         try (Connection connection = conexion_base()) {
-            String sql = "SELECT * FROM Medicos WHERE nombre LIKE ?";
+            String sql = "SELECT * FROM Medicos WHERE nombres LIKE ?";
             PreparedStatement pst = connection.prepareStatement(sql);
             pst.setString(1, "%" + nombreBuscar + "%");
             ResultSet rs = pst.executeQuery();
@@ -121,19 +121,19 @@ public class EliminarDoctor extends JFrame {
     }
 
     private void eliminarDoctor() {
-        String nombre = nombreTextField.getText().trim();
+        String nombres = nombreTextField.getText().trim();
 
-        if (nombre.isEmpty()) {
+        if (nombres.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Por favor, busque y seleccione un doctor antes de eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(null, "¿Está seguro de eliminar al doctor " + nombre + "?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+        int confirm = JOptionPane.showConfirmDialog(null, "¿Está seguro de eliminar al doctor " + nombres + "?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try (Connection connection = conexion_base()) {
-                String sql = "DELETE FROM Medicos WHERE nombre = ?";
+                String sql = "DELETE FROM Medicos WHERE nombres = ?";
                 PreparedStatement pst = connection.prepareStatement(sql);
-                pst.setString(1, nombre);
+                pst.setString(1, nombres);
                 int rowsDeleted = pst.executeUpdate();
 
                 if (rowsDeleted > 0) {

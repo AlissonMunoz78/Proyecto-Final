@@ -33,7 +33,7 @@ public class AgregarPaciente extends JFrame {
 
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new GridLayout(7, 2));
-        inputPanel.add(new JLabel("Nombre:"));
+        inputPanel.add(new JLabel("Nombres:"));
         inputPanel.add(nombreTextField);
         inputPanel.add(new JLabel("Apellido:"));
         inputPanel.add(apellidoTextField);
@@ -83,23 +83,23 @@ public class AgregarPaciente extends JFrame {
     }
 
     private void guardarPaciente() {
-        String nombre = nombreTextField.getText().trim();
+        String nombres = nombreTextField.getText().trim();
         String apellido = apellidoTextField.getText().trim();
         String lugarNacimiento = lugarNacimientoTextField.getText().trim();
         String edad = edadTextField.getText().trim();
         String genero = generoTextField.getText().trim();
         String telefono = telefonoTextField.getText().trim();
 
-        if (nombre.isEmpty() || apellido.isEmpty() || lugarNacimiento.isEmpty() ||
+        if (nombres.isEmpty() || apellido.isEmpty() || lugarNacimiento.isEmpty() ||
                 edad.isEmpty() || genero.isEmpty() || telefono.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try (Connection connection = conexionBase()) {
-            String sql = "INSERT INTO Pacientes (nombre, apellido, lugar_nacimiento, edad, genero, telefono) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO Pacientes (nombres, apellido, lugar_nacimiento, edad, genero, telefono) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement pst = connection.prepareStatement(sql);
-            pst.setString(1, nombre);
+            pst.setString(1, nombres);
             pst.setString(2, apellido);
             pst.setString(3, lugarNacimiento);
             pst.setInt(4, Integer.parseInt(edad));

@@ -23,7 +23,7 @@ public class BuscarDoctor extends JFrame{
         cancelarButton = new JButton("Cancelar");
 
         JPanel inputPanel = new JPanel();
-        inputPanel.add(new JLabel("Nombre:"));
+        inputPanel.add(new JLabel("nombres:"));
         inputPanel.add(nombreTextField);
         inputPanel.add(buscarButton);
 
@@ -64,30 +64,30 @@ public class BuscarDoctor extends JFrame{
     }
 
     private void buscarDoctor() {
-        String nombre = nombreTextField.getText().trim();
+        String nombres = nombreTextField.getText().trim();
 
-        if (nombre.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor, ingrese el nombre del doctor.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (nombres.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor, ingrese el nombres del doctor.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try (Connection connection = conexion_base()) {
-            String sql = "SELECT * FROM Medicos WHERE nombre LIKE ?";
+            String sql = "SELECT * FROM Medicos WHERE nombres LIKE ?";
             PreparedStatement pst = connection.prepareStatement(sql);
-            pst.setString(1, "%" + nombre + "%");
+            pst.setString(1, "%" + nombres + "%");
             ResultSet rs = pst.executeQuery();
 
             StringBuilder resultados = new StringBuilder();
             while (rs.next()) {
                 resultados.append("ID: ").append(rs.getInt("id")).append("\n")
-                        .append("Nombre: ").append(rs.getString("nombre")).append("\n")
+                        .append("nombres: ").append(rs.getString("nombres")).append("\n")
                         .append("Especialidad: ").append(rs.getString("especialidad")).append("\n")
                         .append("Horario Mañana: ").append(rs.getString("horario_mañana")).append("\n")
                         .append("Horario Tarde: ").append(rs.getString("horario_tarde")).append("\n\n");
             }
 
             if (resultados.length() == 0) {
-                resultados.append("No se encontraron doctores con el nombre: ").append(nombre);
+                resultados.append("No se encontraron doctores con el nombres: ").append(nombres);
             }
 
             resultadoTextArea.setText(resultados.toString());
