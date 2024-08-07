@@ -30,14 +30,13 @@ public class Administrador extends JFrame {
         reportesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                new Reportes();
             }
         });
         Gpacientes.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new GestionarPacientes();
-
             }
         });
         salir.addActionListener(new ActionListener() {

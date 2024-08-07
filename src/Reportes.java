@@ -3,124 +3,191 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultCategoryDataset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Reportes extends JFrame {
-    private JPanel panelReportes;
     private JButton verCitas;
     private JButton verDoctores;
     private JButton salir;
+    private JPanel panelReportes;
+    private JPanel chartPanel;
 
     public Reportes() {
-        super("Reportes");
-        setContentPane(panelReportes);
+        setTitle("Reportes");
         setSize(800, 600);
-        setResizable(false);
-        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
+        setContentPane(panelReportes);
+        chartPanel.setLayout(new BorderLayout());
 
         verCitas.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mostrarGraficoCitas();
+                displayCitasChart();
             }
         });
 
         verDoctores.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mostrarGraficoDoctores();
+                displayDoctoresChart();
             }
         });
 
         salir.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int confirm = JOptionPane.showConfirmDialog(null, "¿Desea Salir del Sistema?", "Confirmar Salida", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    dispose();
-                }
+                dispose();
             }
         });
     }
 
-    private void mostrarGraficoCitas() {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        try (Connection conn = conexion_base()) {
-            String sql = "SELECT fecha, COUNT(*) as total FROM Citas GROUP BY fecha";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                String fecha = rs.getString("fecha");
-                int total = rs.getInt("total");
-                dataset.addValue(total, "Citas", fecha);
-            }
-
-            JFreeChart chart = ChartFactory.createBarChart(
-                    "Citas Registradas",
-                    "Fecha",
-                    "Número de Citas",
-                    dataset
-            );
-
-            ChartPanel chartPanel = new ChartPanel(chart);
-            chartPanel.setPreferredSize(new Dimension(800, 400));
-            setContentPane(chartPanel);
-            revalidate();
-            repaint();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al obtener datos de citas: " + ex.getMessage());
-        }
+    private void displayCitasChart() {
+        chartPanel.removeAll();
+        chartPanel.add(new CitasChartPanel(), BorderLayout.CENTER);
+        chartPanel.revalidate();
+        chartPanel.repaint();
     }
 
-    private void mostrarGraficoDoctores() {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        try (Connection conn = conexion_base()) {
-            String sql = "SELECT especialidad, COUNT(*) as total FROM Medicos GROUP BY especialidad";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                String especialidad = rs.getString("especialidad");
-                int total = rs.getInt("total");
-                dataset.addValue(total, "Doctores", especialidad);
-            }
-
-            JFreeChart chart = ChartFactory.createBarChart(
-                    "Doctores por Especialidad",
-                    "Especialidad",
-                    "Número de Doctores",
-                    dataset
-            );
-
-            ChartPanel chartPanel = new ChartPanel(chart);
-            chartPanel.setPreferredSize(new Dimension(800, 400));
-            setContentPane(chartPanel);
-            revalidate();
-            repaint();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al obtener datos de doctores: " + ex.getMessage());
-        }
-    }
-
-    private Connection conexion_base() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/medicare";
-        String usuarioBD = "root";
-        String contraseña = "123456";
-        return DriverManager.getConnection(url, usuarioBD, contraseña);
+    private void displayDoctoresChart() {
+        chartPanel.removeAll();
+        chartPanel.add(new DoctoresChartPanel(), BorderLayout.CENTER);
+        chartPanel.revalidate();
+        chartPanel.repaint();
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new Reportes().setVisible(true);
+            Reportes reportes = new Reportes();
+            reportes.setVisible(true);
         });
+    }
+}
+
+class CitasChartPanel extends JPanel {
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        String query = "SELECT especialidad, COUNT(*) as cantidad FROM Citas GROUP BY especialidad";
+        List<Color> colors = List.of(Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE, Color.CYAN);
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/medicare", "root", "123456");
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            int x = 50;
+            int y = getHeight() - 50;
+            int barWidth = 50;
+            int maxHeight = getHeight() - 100;
+            int spaceBetweenBars = 40;
+            int colorIndex = 0;
+            List<String> especialidades = new ArrayList<>();
+            List<Color> usedColors = new ArrayList<>();
+
+            while (rs.next()) {
+                String especialidad = rs.getString("especialidad");
+                int cantidad = rs.getInt("cantidad");
+                int barHeight = (int) ((double) cantidad / 10 * maxHeight);
+
+                Color barColor = colors.get(colorIndex % colors.size());
+                g2.setColor(barColor);
+                g2.fillRect(x, y - barHeight, barWidth, barHeight);
+
+                g2.setColor(Color.BLACK);
+                g2.drawRect(x, y - barHeight, barWidth, barHeight);
+
+                // Mostrar la cantidad en lugar del nombre de la especialidad
+                g2.drawString(String.valueOf(cantidad), x, y - barHeight - 5); // Ajusta la posición según sea necesario
+
+                x += barWidth + spaceBetweenBars;
+                especialidades.add(especialidad);
+                usedColors.add(barColor);
+                colorIndex++;
+            }
+
+            // Añadir leyenda
+            g2.setFont(new Font("Arial", Font.PLAIN, 12));
+            int legendX = 50;
+            int legendY = 50;
+            int legendBoxSize = 20;
+
+            for (int i = 0; i < especialidades.size(); i++) {
+                g2.setColor(usedColors.get(i));
+                g2.fillRect(legendX, legendY + i * (legendBoxSize + 5), legendBoxSize, legendBoxSize);
+
+                g2.setColor(Color.BLACK);
+                g2.drawString(especialidades.get(i), legendX + legendBoxSize + 5, legendY + i * (legendBoxSize + 5) + legendBoxSize - 5);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+class DoctoresChartPanel extends JPanel {
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        String query = "SELECT especialidad, COUNT(*) as cantidad FROM Medicos GROUP BY especialidad";
+        List<Color> colors = List.of(Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE, Color.CYAN);
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/medicare", "root", "123456");
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            int total = 0;
+            List<Integer> quantities = new ArrayList<>();
+            List<String> especialidades = new ArrayList<>();
+
+            while (rs.next()) {
+                String especialidad = rs.getString("especialidad");
+                int cantidad = rs.getInt("cantidad");
+                especialidades.add(especialidad);
+                quantities.add(cantidad);
+                total += cantidad;
+            }
+
+            if (total == 0) return; // No data to display
+
+            int x = getWidth() / 2;
+            int y = getHeight() / 2;
+            int radius = Math.min(getWidth(), getHeight()) / 3;
+            int startAngle = 0;
+            int colorIndex = 0;
+
+            for (int i = 0; i < quantities.size(); i++) {
+                int arcAngle = (int) Math.round(360.0 * quantities.get(i) / total);
+                g2.setColor(colors.get(colorIndex % colors.size()));
+                g2.fillArc(x - radius, y - radius, 2 * radius, 2 * radius, startAngle, arcAngle);
+
+                // Dibujar etiquetas con cantidad
+                int middleAngle = startAngle + arcAngle / 2;
+                int labelX = (int) (x + (radius + 20) * Math.cos(Math.toRadians(middleAngle)));
+                int labelY = (int) (y - (radius + 20) * Math.sin(Math.toRadians(middleAngle)));
+                g2.setColor(Color.BLACK);
+                g2.drawString(quantities.get(i) + "", labelX, labelY);
+
+                startAngle += arcAngle;
+                colorIndex++;
+            }
+
+            // Añadir leyenda
+            g2.setFont(new Font("Arial", Font.PLAIN, 12));
+            int legendX = 50;
+            int legendY = getHeight() - 200;
+            int legendBoxSize = 20;
+
+            for (int i = 0; i < especialidades.size(); i++) {
+                g2.setColor(colors.get(i % colors.size()));
+                g2.fillRect(legendX, legendY + i * (legendBoxSize + 5), legendBoxSize, legendBoxSize);
+
+                g2.setColor(Color.BLACK);
+                g2.drawString(especialidades.get(i), legendX + legendBoxSize + 5, legendY + i * (legendBoxSize + 5) + legendBoxSize - 5);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 }
