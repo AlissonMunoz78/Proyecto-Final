@@ -70,7 +70,6 @@ Para la implementacion de este menu parte desde el login el cual direcciona a la
 
 
  GESTIONAR MEDICOS
-Objetivo:
 Permitir al administrador crear, actualizar, eliminar y buscar médicos en el sistema.
   
   Crear Médicos:
@@ -96,7 +95,70 @@ Permitir al administrador crear, actualizar, eliminar y buscar médicos en el si
   ![image](https://github.com/user-attachments/assets/e68c178d-1095-4048-8604-0ae2aded638d)
 
   Validaciones y Límites
-   
+  Gestionar Pacientes
+Objetivo:
+Permitir al administrador crear, actualizar, eliminar y buscra pacientes en el sistema.
+
+Funcionalidades Clave:
+
+  Crear Pacientes:
+  Permite ingresar nuevos pacientes en el sistema. Incluye datos como nombre, lugar de nacimiento, edad, género, y contacto.
+  Interfaz: Un formulario con campos para ingresar los datos del paciente y un botón para guardar la información.
+  ![image](https://github.com/user-attachments/assets/155010ee-459b-4b73-afc7-e5d707fba6d2)
+
+  
+  Actualizar Pacientes:
+  Permite modificar la información de pacientes existentes. Esto puede incluir datos personales y de contacto.
+  Interfaz: Una ventana de búsqueda para localizar al paciente a actualizar, seguida de un formulario editable.
+  ![image](https://github.com/user-attachments/assets/bc2ea52c-2859-45b6-9a70-6c4d57a6c435)
+
+  Eliminar Pacientes:
+  Permite eliminar pacientes del sistema. Es importante considerar las citas y tratamientos asociados antes de eliminar.
+  Interfaz: Una opción de búsqueda y un botón para eliminar al paciente seleccionado.
+  ![image](https://github.com/user-attachments/assets/ebed9545-3d92-4252-bfc3-d6ffce33abc6)
+
+  Buscar Pacientes:
+  Permite ver una lista de pacientes con detalles relevantes. Se puede buscar por nombre, número de cédula, etc.
+  Interfaz: Una vista de lista o tabla que muestra pacientes con opciones de búsqueda y filtrado.
+  ![image](https://github.com/user-attachments/assets/4af7edb4-2047-401d-80f7-d1848cee9d17)
+
+REPORTES
+Permite al administrador crear reportes sobre diferentes aspectos como el número de citas por especialidad y los doctores por especialidad.
+Visualizar Reporte Citas:
+![image](https://github.com/user-attachments/assets/ac23e58a-667c-4670-80e7-b9978f614ca8)
+
+Visualizar Reporte Medicos:
+![image](https://github.com/user-attachments/assets/afadaedb-56a1-4fe5-84a1-613ad7659a70)
 
 
 MENU MEDICOS
+Para la implementacion de este menu parte desde el login el cual direcciona a la ventada del medico que tiene las siguientes opciones Gestionar citas, historial medico, resultados examenes, tratamiento
+![image](https://github.com/user-attachments/assets/a6311f55-08f8-49b5-a565-78dddbe2f2e2)
+
+  Gestión de Citas
+  El sistema permite al personal médico registrar y gestionar citas a través de una interfaz gráfica.
+  ![image](https://github.com/user-attachments/assets/7f4dc323-43fb-45ca-a63d-c77df1d5c9f2)
+
+  Historial Médico
+  Permite registrar y consultar los historiales médicos de los pacientes.
+  ![image](https://github.com/user-attachments/assets/c745b33c-3f0f-479e-b767-f859e2df7121)
+
+  Resultados de Exámenes
+  El sistema permite la entrada y visualización de resultados de exámenes médicos.
+  ![image](https://github.com/user-attachments/assets/a18a70a0-6241-4db8-91a0-ed074c5f7f46)
+
+  Tratamiento
+  El sistema permite ver el tratamiento del paciente
+  ![image](https://github.com/user-attachments/assets/3428c1d3-8b03-469f-a729-d84c8f8b5eb7)
+
+  Funcionamiento
+  Se registran los resultados y se asignan tratamientos basados en los exámenes realizados.
+  
+  Validaciones y Límites
+  Se valida la entrada de datos y la asignación correcta de tratamientos.
+  
+Conclusiones
+La implementación de MediCare ha permitido aplicar conceptos avanzados de Programación Orientada a Objetos y crear un sistema integral para la gestión médica. El sistema facilita la administración eficiente de citas, historiales médicos, resultados y tratamientos, asegurando una experiencia de usuario mejorada y una operación más eficiente.
+
+Proyección
+Futuras versiones de MediCare pueden incluir integraciones adicionales, como la gestión de pagos en línea y mejoras en la visualización de datos estadísticos para una toma de decisiones más informada.
