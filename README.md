@@ -162,3 +162,4 @@ La implementación de MediCare ha permitido aplicar conceptos avanzados de Progr
 
 Proyección
 Futuras versiones de MediCare pueden incluir integraciones adicionales, como la gestión de pagos en línea y mejoras en la visualización de datos estadísticos para una toma de decisiones más informada.
+LINK DEL VIDEO: https://photos.app.goo.gl/iaeGgWZnZGfKrY8d7
