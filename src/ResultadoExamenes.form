@@ -54,10 +54,10 @@
       </component>
       <component id="2b809" class="javax.swing.JLabel">
         <constraints>
-          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Berlin Sans FB Demi" size="24"/>
+          <font name="Bernard MT Condensed" size="24"/>
           <text value="Resultado Médico"/>
         </properties>
       </component>
@@ -100,6 +100,15 @@
           </grid>
         </constraints>
         <properties/>
+      </component>
+      <component id="59cd5" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <icon value="img/examenes.png"/>
+          <text value=""/>
+        </properties>
       </component>
     </children>
   </grid>

@@ -37,14 +37,6 @@
           <text value="Buscar"/>
         </properties>
       </component>
-      <component id="5c69a" class="javax.swing.JLabel">
-        <constraints>
-          <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Registrar Cita "/>
-        </properties>
-      </component>
       <component id="d3d17" class="javax.swing.JLabel">
         <constraints>
           <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -144,6 +136,33 @@
           </grid>
         </constraints>
         <properties/>
+      </component>
+      <component id="79c44" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <icon value="img/edificio.png"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="5c69a" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Bernard MT Condensed" size="24"/>
+          <text value="Registrar Cita "/>
+        </properties>
+      </component>
+      <component id="3fd50" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <icon value="img/calendario.png"/>
+          <text value=""/>
+        </properties>
       </component>
     </children>
   </grid>
